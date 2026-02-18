@@ -10,9 +10,7 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons Library -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --smarthirn-teal: #103030;
@@ -24,6 +22,7 @@
             background-color: #F9FAFB; 
             color: var(--smarthirn-charcoal);
             margin: 0;
+            -webkit-font-smoothing: antialiased;
         }
         .rounded-brand { border-radius: 1.5rem; }
         .rounded-main { border-radius: 3.5rem; }
@@ -35,14 +34,22 @@
         .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
         .custom-scroll::-webkit-scrollbar-thumb { background: var(--smarthirn-yellow); border-radius: 10px; }
         
-        .step-transition { transition: all 0.3s ease-in-out; }
+        .step-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        input:focus, textarea:focus, select:focus {
+            box-shadow: 0 0 0 4px rgba(16, 48, 48, 0.05);
+        }
+
+        .brand-text {
+            letter-spacing: -0.05em;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState } = React;
 
         const ENGINE_CONFIG = {
             meta: { product: "Smarthirn Prompt Engine MVP", version: "0.1.0" },
@@ -114,101 +121,202 @@
                     res = res.replace(new RegExp(`{{${key}}}`, 'g'), value || "");
                 });
                 
-                const finalPrompt = `${res}\n\n### ANTI-GENERIC REGELN ###\n${ENGINE_CONFIG.anti_generic_rules.map(r => "- " + r).join("\n")}`;
+                const finalPrompt = `${res}\n\n### ANTI-GENERIC REGELN (STRENG EINHALTEN) ###\n${ENGINE_CONFIG.anti_generic_rules.map(r => "- " + r).join("\n")}`;
                 setOutput(finalPrompt);
             };
 
-            const inputCls = "w-full bg-white border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-[#103030] transition-all font-medium text-sm";
+            const inputCls = "w-full bg-white border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-[#103030] transition-all font-medium text-sm text-slate-700";
             const labelCls = "block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1";
 
             return (
                 <div className="max-w-6xl mx-auto p-4 md:p-10 space-y-8">
-                    {/* Header */}
-                    <div className="bg-white border border-slate-200 rounded-main shadow-sm p-10 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6">
-                            <div className="bg-[#103030] p-6 rounded-3xl text-[#F8D800] font-black text-2xl">S</div>
-                            <h1 className="text-3xl font-black tracking-tighter uppercase">Smart<span className="text-[#103030]">Hirn</span> Engine</h1>
-                        </div>
-                        <div className="w-full md:w-64">
-                            <div className="flex justify-between text-[10px] font-bold uppercase mb-2">
-                                <span>Fortschritt</span>
-                                <span>{progress}%</span>
+                    {/* Header - New Clean Design without "S" icon */}
+                    <div className="bg-white border border-slate-200 rounded-main shadow-sm p-10 md:p-14 flex flex-col md:flex-row justify-between items-center gap-8">
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-[900] brand-text uppercase leading-none text-[#103030]">
+                                SMART<span className="text-[#F8D800]">HIRN</span> ENGINE
+                            </h1>
+                            <div className="flex items-center gap-4 mt-4">
+                                <span className="bg-[#103030] text-[#F8D800] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">v0.1.0</span>
+                                <span className="text-slate-300 text-[10px] font-bold uppercase tracking-[0.3em]">Strategy Master Tool</span>
                             </div>
-                            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-[#103030] transition-all duration-700" style={{width: `${progress}%`}}></div>
+                        </div>
+                        <div className="w-full md:w-80">
+                            <div className="flex justify-between text-[11px] font-black uppercase mb-3 tracking-widest text-slate-400">
+                                <span>System-Fortschritt</span>
+                                <span className="text-[#103030]">{progress}%</span>
+                            </div>
+                            <div className="h-4 bg-slate-50 border border-slate-100 rounded-full overflow-hidden p-1">
+                                <div className="h-full bg-[#103030] rounded-full transition-all duration-1000 ease-out" style={{width: `${progress}%`}}></div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        {/* Left Side: Wizard */}
-                        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-brand p-8 shadow-sm min-h-[500px] flex flex-col">
-                            <div className="flex-grow">
-                                {step === 0 && (
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl font-black text-[#103030]">01. Brand Setup</h2>
-                                        <div>
-                                            <label className={labelCls}>Name der Marke</label>
-                                            <input className={inputCls} value={brand.brand_name} onChange={e => setBrand({...brand, brand_name: e.target.value})} />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                        {/* Left Side: Wizard Form */}
+                        <div className="lg:col-span-7">
+                            <div className="bg-white border border-slate-200 rounded-brand p-8 md:p-12 shadow-sm h-full flex flex-col">
+                                <div className="flex-grow">
+                                    {step === 0 && (
+                                        <div className="space-y-6 step-transition">
+                                            <h2 className="text-3xl font-black text-[#103030] mb-2 tracking-tight">01. Brand Setup</h2>
+                                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">Definiere das Fundament deiner Marke für präzise Ergebnisse.</p>
+                                            <div>
+                                                <label className={labelCls}>Name der Marke</label>
+                                                <input className={inputCls} value={brand.brand_name} onChange={e => setBrand({...brand, brand_name: e.target.value})} placeholder="z.B. Smarthirn" />
+                                            </div>
+                                            <div>
+                                                <label className={labelCls}>Angebot (Der Core-Value)</label>
+                                                <textarea className={inputCls} rows="3" value={brand.offer} onChange={e => setBrand({...brand, offer: e.target.value})} placeholder="Was genau verkaufst du?" />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label className={labelCls}>Angebot</label>
-                                            <textarea className={inputCls} rows="3" value={brand.offer} onChange={e => setBrand({...brand, offer: e.target.value})} />
+                                    )}
+
+                                    {step === 1 && (
+                                        <div className="space-y-6 step-transition">
+                                            <h2 className="text-3xl font-black text-[#103030] mb-2 tracking-tight">02. Wunschkunde</h2>
+                                            <p className="text-slate-400 text-sm mb-8">Wem helfen wir heute?</p>
+                                            <div>
+                                                <label className={labelCls}>Zielgruppe / Persona</label>
+                                                <input className={inputCls} value={brand.audience} onChange={e => setBrand({...brand, audience: e.target.value})} placeholder="z.B. Agenturinhaber" />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div><label className={labelCls}>USP 1</label><input className={inputCls} value={brand.usp_1} onChange={e => setBrand({...brand, usp_1: e.target.value})} /></div>
+                                                <div><label className={labelCls}>USP 2</label><input className={inputCls} value={brand.usp_2} onChange={e => setBrand({...brand, usp_2: e.target.value})} /></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                                {step === 1 && (
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl font-black text-[#103030]">02. Zielgruppe</h2>
-                                        <div>
-                                            <label className={labelCls}>Wunschkunde</label>
-                                            <input className={inputCls} value={brand.audience} onChange={e => setBrand({...brand, audience: e.target.value})} />
+                                    )}
+
+                                    {step === 2 && (
+                                        <div className="space-y-6 step-transition">
+                                            <h2 className="text-3xl font-black text-[#103030] mb-2 tracking-tight">03. Brand Voice</h2>
+                                            <p className="text-slate-400 text-sm mb-8">Wie wir sprechen – und wie auf keinen Fall.</p>
+                                            <div>
+                                                <label className={labelCls}>Tonalität (Adjektive)</label>
+                                                <input className={inputCls} value={brand.brand_voice_adjectives.join(", ")} onChange={e => setBrand({...brand, brand_voice_adjectives: e.target.value.split(", ")})} placeholder="z.B. klar, direkt, mutig" />
+                                            </div>
+                                            <div>
+                                                <label className={labelCls}>No-Go Wörter</label>
+                                                <input className={inputCls} value={brand.no_go_words.join(", ")} onChange={e => setBrand({...brand, no_go_words: e.target.value.split(", ")})} placeholder="Wörter, die du hasst..." />
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div><label className={labelCls}>USP 1</label><input className={inputCls} value={brand.usp_1} onChange={e => setBrand({...brand, usp_1: e.target.value})} /></div>
-                                            <div><label className={labelCls}>USP 2</label><input className={inputCls} value={brand.usp_2} onChange={e => setBrand({...brand, usp_2: e.target.value})} /></div>
+                                    )}
+
+                                    {step === 3 && (
+                                        <div className="space-y-6 step-transition">
+                                            <h2 className="text-3xl font-black text-[#103030] mb-2 tracking-tight">04. Strategie</h2>
+                                            <p className="text-slate-400 text-sm mb-8">Kontext für die aktuelle Kampagne.</p>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className={labelCls}>Funnel Stage</label>
+                                                    <select className={inputCls} value={campaign.funnel_stage} onChange={e => setCampaign({...campaign, funnel_stage: e.target.value})}>
+                                                        <option value="awareness">Awareness</option>
+                                                        <option value="consideration">Consideration</option>
+                                                        <option value="conversion">Conversion</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className={labelCls}>Grund-Ton</label>
+                                                    <select className={inputCls} value={campaign.tone} onChange={e => setCampaign({...campaign, tone: e.target.value})}>
+                                                        <option value="bold">Bold & Direkt</option>
+                                                        <option value="expert">Autoritär</option>
+                                                        <option value="friendly">Freundlich</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className={labelCls}>Content Pfeiler</label>
+                                                <input className={inputCls} value={campaign.content_pillar} onChange={e => setCampaign({...campaign, content_pillar: e.target.value})} placeholder="z.B. Case Studies" />
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                                {step === 4 && (
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl font-black text-[#103030]">05. Generator</h2>
-                                        <div className="grid grid-cols-2 gap-3 mb-4">
-                                            {ENGINE_CONFIG.modules.map(m => (
-                                                <button key={m.id} onClick={() => setCurrentModule(m.id)}
-                                                    className={`p-4 rounded-2xl border-2 font-bold text-[10px] uppercase transition-all ${currentModule === m.id ? 'bg-[#103030] border-[#103030] text-white' : 'bg-slate-50 border-slate-50 text-slate-400'}`}>
-                                                    {m.label}
-                                                </button>
-                                            ))}
+                                    )}
+
+                                    {step === 4 && (
+                                        <div className="space-y-6 step-transition">
+                                            <h2 className="text-3xl font-black text-[#103030] mb-2 tracking-tight">05. Prompt Engine</h2>
+                                            <p className="text-slate-400 text-sm mb-8">Finale Generierung des Master-Prompts.</p>
+                                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                                {ENGINE_CONFIG.modules.map(m => (
+                                                    <button key={m.id} onClick={() => {
+                                                        setCurrentModule(m.id);
+                                                        const firstTpl = ENGINE_CONFIG.templates.find(t => t.module === m.id);
+                                                        if (firstTpl) setSelectedTpl(firstTpl.id);
+                                                    }}
+                                                    className={`p-6 rounded-2xl border-2 font-black text-[10px] uppercase tracking-[0.2em] transition-all ${currentModule === m.id ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-xl translate-y-[-2px]' : 'bg-slate-50 border-slate-50 text-slate-400 hover:border-slate-200'}`}>
+                                                        {m.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="mb-8">
+                                                <label className={labelCls}>Gewähltes Template</label>
+                                                <select className={inputCls} value={selectedTpl} onChange={e => setSelectedTpl(e.target.value)}>
+                                                    {ENGINE_CONFIG.templates.filter(t => t.module === currentModule).map(t => (
+                                                        <option key={t.id} value={t.id}>{t.purpose}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <button onClick={generatePrompt} className="w-full bg-[#103030] text-[#F8D800] font-[900] py-6 rounded-2xl shadow-2xl hover:scale-[1.01] active:scale-[0.99] transition-all text-xl tracking-tight uppercase">
+                                                PROMPT JETZT GENERIEREN
+                                            </button>
                                         </div>
-                                        <select className={inputCls} value={selectedTpl} onChange={e => setSelectedTpl(e.target.value)}>
-                                            {ENGINE_CONFIG.templates.filter(t => t.module === currentModule).map(t => (
-                                                <option key={t.id} value={t.id}>{t.purpose}</option>
-                                            ))}
-                                        </select>
-                                        <button onClick={generatePrompt} className="w-full bg-[#F8D800] text-[#103030] font-black py-4 rounded-2xl shadow-xl hover:scale-[1.02] transition-all">
-                                            PROMPT GENERIEREN
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex justify-between mt-10 pt-6 border-t border-slate-100">
-                                <button onClick={() => setStep(s => Math.max(0, s-1))} className="text-slate-400 font-bold uppercase text-xs">Zurück</button>
-                                <button onClick={() => setStep(s => Math.min(4, s+1))} className="bg-[#103030] text-white px-8 py-3 rounded-xl font-bold text-sm">Weiter</button>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-between mt-12 pt-8 border-t border-slate-100">
+                                    <button onClick={() => setStep(s => Math.max(0, s-1))} 
+                                        className={`text-slate-300 font-black uppercase text-[10px] tracking-widest transition-colors ${step === 0 ? 'opacity-0' : 'hover:text-[#103030]'}`}>
+                                        ← Zurück
+                                    </button>
+                                    <button onClick={() => setStep(s => Math.min(4, s+1))} 
+                                        className={`bg-[#103030] text-white px-12 py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all hover:bg-[#F8D800] hover:text-[#103030] shadow-lg ${step === 4 ? 'hidden' : 'block'}`}>
+                                        Weiter →
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Right Side: Terminal */}
+                        {/* Right Side: Terminal Output */}
                         <div className="lg:col-span-5">
-                            <div className="bg-[#103030] rounded-brand terminal-shadow flex flex-col h-full min-h-[500px] border-[6px] border-slate-800">
-                                <div className="p-5 border-b border-white/5 bg-black/20 text-[#F8D800] font-black text-[10px] tracking-widest uppercase">System Output</div>
-                                <div className="flex-grow p-6 font-mono text-sm text-white/80 overflow-y-auto custom-scroll whitespace-pre-wrap leading-relaxed">
-                                    {output || "// Warte auf Generierung..."}
+                            <div className="bg-[#103030] rounded-brand terminal-shadow flex flex-col h-full min-h-[600px] border-[10px] border-slate-900 sticky top-10">
+                                <div className="p-7 border-b border-white/5 bg-black/40 flex justify-between items-center">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-[#F8D800] shadow-[0_0_10px_#F8D800]"></div>
+                                        <span className="text-white/60 font-black text-[10px] tracking-[0.3em] uppercase">Engine Terminal</span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-white/5"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-white/5"></div>
+                                    </div>
                                 </div>
-                                <div className="p-5 bg-black/20">
-                                    <button onClick={() => {navigator.clipboard.writeText(output); setCopied(true); setTimeout(()=>setCopied(false),2000)}} 
-                                        className="w-full py-4 rounded-xl font-bold text-sm bg-white/10 text-white hover:bg-white/20">
-                                        {copied ? "KOPIERT ✓" : "PROMPT KOPIEREN"}
+                                
+                                <div className="flex-grow p-10 font-mono text-[13px] text-slate-300 overflow-y-auto custom-scroll whitespace-pre-wrap leading-loose">
+                                    {output || (
+                                        <div className="opacity-30 flex flex-col gap-4">
+                                            <span className="text-[#F8D800] font-bold tracking-widest uppercase text-[10px]">System ready.</span>
+                                            <span>// SMART-HIRN ENGINE BOOTING...</span>
+                                            <span>// STATUS: AWAITING BRAND DATA</span>
+                                            <div className="mt-6 border border-white/5 p-6 rounded-2xl bg-white/5">
+                                                <span className="text-[10px] font-black tracking-widest opacity-50 uppercase">Workflow:</span>
+                                                <ul className="mt-4 list-none space-y-3 text-[12px]">
+                                                    <li className="flex gap-3"><span className="text-[#F8D800]">01</span> Brand Identity</li>
+                                                    <li className="flex gap-3"><span className="text-[#F8D800]">02</span> Customer Profile</li>
+                                                    <li className="flex gap-3"><span className="text-[#F8D800]">03</span> Strategy Context</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="p-7 bg-black/50 border-t border-white/5">
+                                    <button 
+                                        onClick={() => {navigator.clipboard.writeText(output); setCopied(true); setTimeout(()=>setCopied(false), 2000)}} 
+                                        disabled={!output}
+                                        className={`w-full py-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] transition-all border-2 ${
+                                            !output ? 'border-white/5 text-white/10 cursor-not-allowed' : 
+                                            copied ? 'bg-green-600 border-green-600 text-white' : 
+                                            'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-[#F8D800]'
+                                        }`}>
+                                        {copied ? "Prompt kopiert! ✓" : "System Prompt kopieren"}
                                     </button>
                                 </div>
                             </div>
