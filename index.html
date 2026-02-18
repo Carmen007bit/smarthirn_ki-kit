@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHirn Prompt Engine - Wizard v0.1.0</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & Babel for Browser Rendering -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --smarthirn-teal: #103030;
+            --smarthirn-yellow: #F8D800;
+            --smarthirn-charcoal: #111827;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #F9FAFB; 
+            color: var(--smarthirn-charcoal);
+            margin: 0;
+        }
+        .rounded-brand { border-radius: 1.5rem; }
+        .rounded-main { border-radius: 3.5rem; }
+        .terminal-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        /* Custom Scrollbar for Terminal */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--smarthirn-yellow); border-radius: 10px; }
+        
+        .step-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const ENGINE_CONFIG = {
+            meta: { product: "Smarthirn Prompt Engine MVP", version: "0.1.0" },
+            anti_generic_rules: [
+                "Keine leeren Claims (z.B. „innovativ“, „revolutionär“).",
+                "Keine Floskeln wie „Entdecke“ oder „In diesem Beitrag“.",
+                "Konkrete Beispiele und Zahlen einbauen.",
+                "Kurze Sätze. Aktiv statt Passiv.",
+                "Brand Voice konsequent einhalten.",
+                "No-Go-Wörter strikt vermeiden.",
+                "Klare Struktur liefern.",
+                "Keine Emojis, außer ausdrücklich gewünscht."
+            ],
+            modules: [
+                { id: "content_generator", label: "Content", icon: "layout" },
+                { id: "hooks_angles", label: "Hooks", icon: "type" },
+                { id: "video_scripts", label: "Video", icon: "video" },
+                { id: "ads_offer_copy", label: "Ads", icon: "target" }
+            ],
+            templates: [
+                {
+                    id: "tpl_quickwin_ig_post_v1",
+                    module: "content_generator",
+                    purpose: "Instagram Post (Direkt-Prompt)",
+                    body: "Rolle: Senior Content-Stratege.\nMarke: {{brand_name}}\nAngebot: {{offer}}\nZielgruppe: {{audience}}\nUSPs: {{usp_1}}, {{usp_2}}\nVoice: {{brand_voice_adjectives}}\nCTA: {{cta}}\n\nAufgabe: Erstelle einen Instagram Post für die Phase {{funnel_stage}}. Thema: {{content_pillar}}. Tonalität: {{tone}}."
+                },
+                {
+                    id: "tpl_hooks_v1",
+                    module: "hooks_angles",
+                    purpose: "30 Scroll-Stopper Hooks",
+                    body: "Erzeuge 30 Hooks für {{brand_name}}. Angebot: {{offer}}. Zielgruppe: {{audience}}. No-Go Wörter: {{no_go_words}}."
+                }
+            ]
+        };
+
+        const DEFAULT_BRAND = {
+            brand_name: "Smarthirn (Demo)",
+            offer: "Marketing-Systeme + Prompts für Solopreneure.",
+            audience: "Freelancer, die Struktur statt Chaos wollen.",
+            usp_1: "Fahrplan statt Bibliothek",
+            usp_2: "Stammdaten-Fokus",
+            usp_3: "Anti-Generic Regeln",
+            brand_voice_adjectives: ["klar", "direkt", "reduziert"],
+            no_go_words: ["revolutionär", "bahnbrechend", "entdecken"],
+            cta: "Schreib „SYSTEM“ für Infos."
+        };
+
+        const App = () => {
+            const [step, setStep] = useState(0);
+            const [brand, setBrand] = useState(DEFAULT_BRAND);
+            const [campaign, setCampaign] = useState({
+                funnel_stage: "consideration",
+                tone: "bold",
+                content_pillar: "Marketing ohne Chaos"
+            });
+            const [currentModule, setCurrentModule] = useState("content_generator");
+            const [selectedTpl, setSelectedTpl] = useState(ENGINE_CONFIG.templates[0].id);
+            const [output, setOutput] = useState("");
+            const [copied, setCopied] = useState(false);
+
+            const progress = Math.round(((step + 1) / 5) * 100);
+
+            const generatePrompt = () => {
+                const tpl = ENGINE_CONFIG.templates.find(t => t.id === selectedTpl);
+                let res = tpl.body;
+                const data = { ...brand, ...campaign };
+                Object.keys(data).forEach(key => {
+                    const value = Array.isArray(data[key]) ? data[key].join(", ") : data[key];
+                    res = res.replace(new RegExp(`{{${key}}}`, 'g'), value || "");
+                });
+                
+                const finalPrompt = `${res}\n\n### ANTI-GENERIC REGELN ###\n${ENGINE_CONFIG.anti_generic_rules.map(r => "- " + r).join("\n")}`;
+                setOutput(finalPrompt);
+            };
+
+            const inputCls = "w-full bg-white border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-[#103030] transition-all font-medium text-sm";
+            const labelCls = "block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1";
+
+            return (
+                <div className="max-w-6xl mx-auto p-4 md:p-10 space-y-8">
+                    {/* Header */}
+                    <div className="bg-white border border-slate-200 rounded-main shadow-sm p-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div className="flex items-center gap-6">
+                            <div className="bg-[#103030] p-6 rounded-3xl text-[#F8D800] font-black text-2xl">S</div>
+                            <h1 className="text-3xl font-black tracking-tighter uppercase">Smart<span className="text-[#103030]">Hirn</span> Engine</h1>
+                        </div>
+                        <div className="w-full md:w-64">
+                            <div className="flex justify-between text-[10px] font-bold uppercase mb-2">
+                                <span>Fortschritt</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-[#103030] transition-all duration-700" style={{width: `${progress}%`}}></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {/* Left Side: Wizard */}
+                        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-brand p-8 shadow-sm min-h-[500px] flex flex-col">
+                            <div className="flex-grow">
+                                {step === 0 && (
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl font-black text-[#103030]">01. Brand Setup</h2>
+                                        <div>
+                                            <label className={labelCls}>Name der Marke</label>
+                                            <input className={inputCls} value={brand.brand_name} onChange={e => setBrand({...brand, brand_name: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className={labelCls}>Angebot</label>
+                                            <textarea className={inputCls} rows="3" value={brand.offer} onChange={e => setBrand({...brand, offer: e.target.value})} />
+                                        </div>
+                                    </div>
+                                )}
+                                {step === 1 && (
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl font-black text-[#103030]">02. Zielgruppe</h2>
+                                        <div>
+                                            <label className={labelCls}>Wunschkunde</label>
+                                            <input className={inputCls} value={brand.audience} onChange={e => setBrand({...brand, audience: e.target.value})} />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div><label className={labelCls}>USP 1</label><input className={inputCls} value={brand.usp_1} onChange={e => setBrand({...brand, usp_1: e.target.value})} /></div>
+                                            <div><label className={labelCls}>USP 2</label><input className={inputCls} value={brand.usp_2} onChange={e => setBrand({...brand, usp_2: e.target.value})} /></div>
+                                        </div>
+                                    </div>
+                                )}
+                                {step === 4 && (
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl font-black text-[#103030]">05. Generator</h2>
+                                        <div className="grid grid-cols-2 gap-3 mb-4">
+                                            {ENGINE_CONFIG.modules.map(m => (
+                                                <button key={m.id} onClick={() => setCurrentModule(m.id)}
+                                                    className={`p-4 rounded-2xl border-2 font-bold text-[10px] uppercase transition-all ${currentModule === m.id ? 'bg-[#103030] border-[#103030] text-white' : 'bg-slate-50 border-slate-50 text-slate-400'}`}>
+                                                    {m.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <select className={inputCls} value={selectedTpl} onChange={e => setSelectedTpl(e.target.value)}>
+                                            {ENGINE_CONFIG.templates.filter(t => t.module === currentModule).map(t => (
+                                                <option key={t.id} value={t.id}>{t.purpose}</option>
+                                            ))}
+                                        </select>
+                                        <button onClick={generatePrompt} className="w-full bg-[#F8D800] text-[#103030] font-black py-4 rounded-2xl shadow-xl hover:scale-[1.02] transition-all">
+                                            PROMPT GENERIEREN
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex justify-between mt-10 pt-6 border-t border-slate-100">
+                                <button onClick={() => setStep(s => Math.max(0, s-1))} className="text-slate-400 font-bold uppercase text-xs">Zurück</button>
+                                <button onClick={() => setStep(s => Math.min(4, s+1))} className="bg-[#103030] text-white px-8 py-3 rounded-xl font-bold text-sm">Weiter</button>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Terminal */}
+                        <div className="lg:col-span-5">
+                            <div className="bg-[#103030] rounded-brand terminal-shadow flex flex-col h-full min-h-[500px] border-[6px] border-slate-800">
+                                <div className="p-5 border-b border-white/5 bg-black/20 text-[#F8D800] font-black text-[10px] tracking-widest uppercase">System Output</div>
+                                <div className="flex-grow p-6 font-mono text-sm text-white/80 overflow-y-auto custom-scroll whitespace-pre-wrap leading-relaxed">
+                                    {output || "// Warte auf Generierung..."}
+                                </div>
+                                <div className="p-5 bg-black/20">
+                                    <button onClick={() => {navigator.clipboard.writeText(output); setCopied(true); setTimeout(()=>setCopied(false),2000)}} 
+                                        className="w-full py-4 rounded-xl font-bold text-sm bg-white/10 text-white hover:bg-white/20">
+                                        {copied ? "KOPIERT ✓" : "PROMPT KOPIEREN"}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
