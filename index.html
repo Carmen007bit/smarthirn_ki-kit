@@ -41,7 +41,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, memo } = React;
         
         /**
          * Icon Wrapper für maximale Kompatibilität
@@ -68,6 +68,95 @@
             return <span ref={iconRef} className="inline-flex items-center justify-center"></span>;
         };
 
+        // --- Stabile Input Komponenten um Cursor-Sprünge zu vermeiden ---
+        
+        const InputField = memo(({ label, value, onChange, placeholder, icon }) => (
+            <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
+                    {icon && <Icon name={icon} size={12} className="opacity-40" />} {label}
+                </label>
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder}
+                    className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
+                />
+            </div>
+        ));
+
+        const MultiSelectChannels = memo(({ selectedChannels, onChange }) => {
+            const channels = ["Instagram", "TikTok", "LinkedIn", "YouTube", "Facebook", "Twitter/X"];
+            
+            const toggleChannel = (channel) => {
+                if (selectedChannels.includes(channel)) {
+                    onChange(selectedChannels.filter(c => c !== channel));
+                } else {
+                    onChange([...selectedChannels, channel]);
+                }
+            };
+
+            return (
+                <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
+                        <Icon name="Share2" size={12} className="opacity-40" /> Kanäle
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                        {channels.map(channel => (
+                            <button
+                                key={channel}
+                                onClick={() => toggleChannel(channel)}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${
+                                    selectedChannels.includes(channel)
+                                    ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-md'
+                                    : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                                }`}
+                            >
+                                {channel}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        });
+
+        const TagInput = memo(({ label, tags, onAdd, onRemove, icon, colorClass = "bg-slate-100" }) => {
+            const [val, setVal] = useState('');
+            return (
+                <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
+                        {icon && <Icon name={icon} size={12} className="opacity-40" />} {label}
+                    </label>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={val}
+                            onChange={(e) => setVal(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && val) { onAdd(val); setVal(''); }}}
+                            className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
+                            placeholder="Hinzufügen..."
+                        />
+                        <button 
+                            onClick={() => { if(val) { onAdd(val); setVal(''); }}}
+                            className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg"
+                        >
+                            <Icon name="Plus" size={24} />
+                        </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-2">
+                        {tags.map((tag, i) => (
+                            <span key={tag + i} className={`flex items-center gap-2 ${colorClass} text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider`}>
+                                {tag}
+                                <button onClick={() => onRemove(tag)} className="hover:text-red-500 transition-colors">
+                                    <Icon name="X" size={12} />
+                                </button>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            );
+        });
+
         const App = () => {
             // --- Konfiguration & Konstanten ---
             const ANTI_GENERIC_RULES = [
@@ -84,11 +173,9 @@
             // --- State Management ---
             const [activeTab, setActiveTab] = useState('brand');
             const [currentBrand, setCurrentBrand] = useState({
-                brand_id: 'brand_001',
                 brand_name: 'Stitch & Line',
                 offer: 'Individuelle T‑Shirt-Designs für Creator in 72 Stunden.',
                 audience: 'Creator und kleine E‑Com Brands (1–5 Personen).',
-                primary_goal: 'leads',
                 channels: ['Instagram', 'TikTok'],
                 usp_1: '72h Delivery: Druckdateien + Mockups',
                 usp_2: 'Stil-Check: Designs passen zum Brand-Style',
@@ -110,126 +197,47 @@
             const [generatedPrompt, setGeneratedPrompt] = useState('');
             const [copied, setCopied] = useState(false);
 
-            // --- Logik: Prompt Generation (VERBESSERT & EXAKTER) ---
+            // --- Handlers ---
+            const updateBrand = (key, value) => setCurrentBrand(prev => ({ ...prev, [key]: value }));
+            const updateCampaign = (key, value) => setCampaign(prev => ({ ...prev, [key]: value }));
+
             const handleGeneratePrompt = () => {
                 const prompt = `
-ROLLE: Du bist ein Senior Content-Stratege und psychologisch geschulter Copywriter. Dein Fokus liegt auf Performance-Marketing und markenspezifischem Storytelling.
-
+ROLLE: Senior Content-Stratege & psychologischer Copywriter.
 KONTEXT:
 - MARKE: ${currentBrand.brand_name}
 - ANGEBOT: ${currentBrand.offer}
-- ZIELGRUPPE: ${currentBrand.audience} (Speziell: ${campaign.audience_segment})
+- ZIELGRUPPE: ${currentBrand.audience} (Segment: ${campaign.audience_segment})
 - KANÄLE: ${currentBrand.channels.join(', ')}
-- WETTBEWERBER-KONTEXT: Wir müssen uns klar gegen ${currentBrand.competitors.join(' und ')} abheben (Qualität vs. Preis/Schnelligkeit).
+- WETTBEWERBER: ${currentBrand.competitors.join(', ')}
 
-STRATEGISCHE PARAMETER:
-- FUNNEL-PHASE: ${campaign.funnel_stage.toUpperCase()} (Übersetze dies in psychologische Trigger: ${campaign.funnel_stage === 'conversion' ? 'Dringlichkeit, Beweislast, Einwandbehandlung' : 'Problemerkennung & Autorität'})
-- FOKUS-THEMA: ${campaign.content_pillar}
-- TONALITÄT: ${currentBrand.brand_voice_adjectives.join(', ')} (Vibe: ${campaign.tone})
+STRATEGIE:
+- PHASE: ${campaign.funnel_stage.toUpperCase()}
+- THEMA: ${campaign.content_pillar}
+- TON: ${currentBrand.brand_voice_adjectives.join(', ')} (Vibe: ${campaign.tone})
 
-WICHTIGSTE USPs (Baue diese zwingend ein):
+USPs:
 1. ${currentBrand.usp_1}
 2. ${currentBrand.usp_2}
 3. ${currentBrand.usp_3}
 
-AUFGABE: Erstelle hochspezifischen Content für ${currentBrand.channels.join(' und ')}. 
+AUFGABE: Erstelle Content für ${currentBrand.channels.join(' & ')}. Nutze für Videos [HOOK -> AGITATION -> PROOF -> CTA].
 
-STRUKTUR-VORGABEN FÜR DEN OUTPUT:
-1. REEL/TIKTOK SKRIPTE: Nutze das Framework [HOOK -> AGITATION -> PROOF -> CTA]. Gib exakte Anweisungen für On-Screen Text (OST) und Voiceover (VO).
-2. CAROUSEL-SLIDES: Definiere jede Slide einzeln. Slide 1 muss eine 'Pattern-Interrupt' Headline haben.
-3. CAPTIONS: Schreibe kurze, 'punchy' Captions. Keine Einleitung, direkt zum Punkt.
-4. DM-STRATEGIE: Wie reagieren wir auf den CTA "${currentBrand.cta}"?
-
-STRENGSTE REGELN GEGEN GENERISCHEN OUTPUT:
-${ANTI_GENERIC_RULES.map(rule => `- ${rule}`).join('\n')}
-- VERBOTENE WÖRTER: ${currentBrand.no_go_words.join(', ')}
-- VERMEIDE ADJEKTIVE WIE "EINZIGARTIG" ODER "HOCHWERTIG". ZEIGE ES DURCH DATEN ODER PROZESSE.
-
-KOMM DIREKT ZUM ERGEBNIS OHNE SMALLTALK.
+ANTI-GENERIC REGELN:
+${ANTI_GENERIC_RULES.join('\n')}
+VERBOTENE WÖRTER: ${currentBrand.no_go_words.join(', ')}
+CTA: ${currentBrand.cta}
                 `.trim();
 
                 setGeneratedPrompt(prompt);
-                
-                // Clipboard fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = prompt;
                 document.body.appendChild(textArea);
                 textArea.select();
-                try {
-                    document.execCommand('copy');
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                } catch (err) {
-                    console.error('Kopieren fehlgeschlagen', err);
-                }
+                document.execCommand('copy');
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
                 document.body.removeChild(textArea);
-            };
-
-            // --- UI Komponenten ---
-            const NavItem = ({ id, icon, label }) => (
-                <button
-                    onClick={() => setActiveTab(id)}
-                    className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all duration-300 group w-full text-left ${
-                        activeTab === id 
-                            ? 'bg-[#103030] text-[#F8D800] shadow-xl scale-[1.02]' 
-                            : 'text-slate-400 hover:bg-slate-100 hover:text-[#103030]'
-                    }`}
-                >
-                    <Icon name={icon} size={20} />
-                    <span className="font-black uppercase text-[11px] tracking-widest">{label}</span>
-                </button>
-            );
-
-            const InputField = ({ label, value, onChange, placeholder, icon }) => (
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                        {icon && <Icon name={icon} size={12} className="opacity-40" />} {label}
-                    </label>
-                    <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder={placeholder}
-                        className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
-                    />
-                </div>
-            );
-
-            const TagInput = ({ label, tags, onAdd, onRemove, icon, colorClass = "bg-slate-100" }) => {
-                const [val, setVal] = useState('');
-                return (
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                            {icon && <Icon name={icon} size={12} className="opacity-40" />} {label}
-                        </label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={val}
-                                onChange={(e) => setVal(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter' && val) { onAdd(val); setVal(''); }}}
-                                className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
-                                placeholder="Neu..."
-                            />
-                            <button 
-                                onClick={() => { if(val) { onAdd(val); setVal(''); }}}
-                                className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg"
-                            >
-                                <Icon name="Plus" size={24} />
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-2">
-                            {tags.map((tag, i) => (
-                                <span key={i} className={`flex items-center gap-2 ${colorClass} text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider`}>
-                                    {tag}
-                                    <button onClick={() => onRemove(tag)} className="hover:text-red-500 transition-colors">
-                                        <Icon name="X" size={12} />
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                );
             };
 
             return (
@@ -246,80 +254,55 @@ KOMM DIREKT ZUM ERGEBNIS OHNE SMALLTALK.
                             </div>
 
                             <nav className="flex flex-col space-y-3">
-                                <NavItem id="brand" icon="ShieldCheck" label="Brand Identity" />
-                                <NavItem id="campaign" icon="Target" label="Strategie Setup" />
-                                <NavItem id="generator" icon="PenTool" label="Prompt Engine" />
+                                <button onClick={() => setActiveTab('brand')} className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === 'brand' ? 'bg-[#103030] text-[#F8D800] shadow-xl' : 'text-slate-400 hover:bg-slate-100'}`}>
+                                    <Icon name="ShieldCheck" size={20} />
+                                    <span className="font-black uppercase text-[11px] tracking-widest">Brand Identity</span>
+                                </button>
+                                <button onClick={() => setActiveTab('campaign')} className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === 'campaign' ? 'bg-[#103030] text-[#F8D800] shadow-xl' : 'text-slate-400 hover:bg-slate-100'}`}>
+                                    <Icon name="Target" size={20} />
+                                    <span className="font-black uppercase text-[11px] tracking-widest">Strategie Setup</span>
+                                </button>
+                                <button onClick={() => setActiveTab('generator')} className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === 'generator' ? 'bg-[#103030] text-[#F8D800] shadow-xl' : 'text-slate-400 hover:bg-slate-100'}`}>
+                                    <Icon name="PenTool" size={20} />
+                                    <span className="font-black uppercase text-[11px] tracking-widest">Prompt Engine</span>
+                                </button>
                             </nav>
 
-                            <div className="bg-[#103030] rounded-[2rem] p-7 text-white shadow-2xl mt-auto relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                                    <Icon name="Award" size={80} />
-                                </div>
-                                <div className="relative z-10">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-2 h-2 rounded-full bg-[#F8D800] animate-pulse"></div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F8D800]">Live Profile</span>
-                                    </div>
-                                    <p className="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name || 'Marke fehlt'}</p>
-                                    <p className="text-[11px] text-slate-400 font-medium line-clamp-2 italic">"{currentBrand.offer}"</p>
-                                </div>
+                            <div className="bg-[#103030] rounded-[2rem] p-7 text-white shadow-2xl mt-auto overflow-hidden">
+                                <p className="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name}</p>
+                                <p className="text-[11px] text-slate-400 italic line-clamp-2">"{currentBrand.offer}"</p>
                             </div>
                         </aside>
 
                         {/* Main Content Area */}
-                        <main className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden flex flex-col min-h-[850px]">
-                            <div className="p-10 md:p-14 flex-grow">
+                        <main className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden min-h-[850px]">
+                            <div className="p-10 md:p-14">
                                 
                                 {activeTab === 'brand' && (
                                     <div className="space-y-12 animate-in">
-                                        <div>
-                                            <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
-                                            <p className="text-slate-400 font-medium mt-1">Definiere das genetische Profil deiner Marke.</p>
-                                        </div>
-
+                                        <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                             <div className="space-y-8">
-                                                <InputField label="Markenname" icon="Briefcase" value={currentBrand.brand_name} onChange={(v) => setCurrentBrand({...currentBrand, brand_name: v})} />
-                                                <InputField label="Zielgruppe (Basis)" icon="Users" value={currentBrand.audience} onChange={(v) => setCurrentBrand({...currentBrand, audience: v})} />
+                                                <InputField label="Markenname" icon="Briefcase" value={currentBrand.brand_name} onChange={(v) => updateBrand('brand_name', v)} />
+                                                <InputField label="Zielgruppe" icon="Users" value={currentBrand.audience} onChange={(v) => updateBrand('audience', v)} />
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                                                        <Icon name="Megaphone" size={12} className="opacity-40" /> Core-Angebot
-                                                    </label>
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Angebot</label>
                                                     <textarea 
                                                         value={currentBrand.offer}
-                                                        onChange={(e) => setCurrentBrand({...currentBrand, offer: e.target.value})}
-                                                        className="w-full h-24 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
+                                                        onChange={(e) => updateBrand('offer', e.target.value)}
+                                                        className="w-full h-24 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 focus:outline-none focus:border-[#103030]"
                                                     />
                                                 </div>
-                                                <div className="grid grid-cols-1 gap-4">
-                                                    <InputField label="USP 1" value={currentBrand.usp_1} onChange={(v) => setCurrentBrand({...currentBrand, usp_1: v})} />
-                                                    <InputField label="USP 2" value={currentBrand.usp_2} onChange={(v) => setCurrentBrand({...currentBrand, usp_2: v})} />
-                                                    <InputField label="USP 3" value={currentBrand.usp_3} onChange={(v) => setCurrentBrand({...currentBrand, usp_3: v})} />
-                                                </div>
+                                                <InputField label="USP 1" value={currentBrand.usp_1} onChange={(v) => updateBrand('usp_1', v)} />
+                                                <InputField label="USP 2" value={currentBrand.usp_2} onChange={(v) => updateBrand('usp_2', v)} />
+                                                <InputField label="USP 3" value={currentBrand.usp_3} onChange={(v) => updateBrand('usp_3', v)} />
                                             </div>
-
                                             <div className="space-y-8">
-                                                <TagInput 
-                                                    label="Kanäle" icon="Share2" tags={currentBrand.channels}
-                                                    onAdd={(t) => setCurrentBrand({...currentBrand, channels: [...currentBrand.channels, t]})}
-                                                    onRemove={(t) => setCurrentBrand({...currentBrand, channels: currentBrand.channels.filter(x => x !== t)})}
-                                                />
-                                                <TagInput 
-                                                    label="Wettbewerber" icon="Target" tags={currentBrand.competitors}
-                                                    onAdd={(t) => setCurrentBrand({...currentBrand, competitors: [...currentBrand.competitors, t]})}
-                                                    onRemove={(t) => setCurrentBrand({...currentBrand, competitors: currentBrand.competitors.filter(x => x !== t)})}
-                                                />
-                                                <TagInput 
-                                                    label="Brand Voice" icon="Mic" tags={currentBrand.brand_voice_adjectives} colorClass="bg-[#F8D800]/20"
-                                                    onAdd={(t) => setCurrentBrand({...currentBrand, brand_voice_adjectives: [...currentBrand.brand_voice_adjectives, t]})}
-                                                    onRemove={(t) => setCurrentBrand({...currentBrand, brand_voice_adjectives: currentBrand.brand_voice_adjectives.filter(x => x !== t)})}
-                                                />
-                                                <TagInput 
-                                                    label="No-Go Wörter" icon="Trash2" tags={currentBrand.no_go_words} colorClass="bg-red-50"
-                                                    onAdd={(t) => setCurrentBrand({...currentBrand, no_go_words: [...currentBrand.no_go_words, t]})}
-                                                    onRemove={(t) => setCurrentBrand({...currentBrand, no_go_words: currentBrand.no_go_words.filter(x => x !== t)})}
-                                                />
-                                                <InputField label="Standard CTA" icon="MessageSquare" value={currentBrand.cta} onChange={(v) => setCurrentBrand({...currentBrand, cta: v})} />
+                                                <MultiSelectChannels selectedChannels={currentBrand.channels} onChange={(v) => updateBrand('channels', v)} />
+                                                <TagInput label="Wettbewerber" icon="Target" tags={currentBrand.competitors} onAdd={(t) => updateBrand('competitors', [...currentBrand.competitors, t])} onRemove={(t) => updateBrand('competitors', currentBrand.competitors.filter(x => x !== t))} />
+                                                <TagInput label="Brand Voice" icon="Mic" tags={currentBrand.brand_voice_adjectives} colorClass="bg-[#F8D800]/20" onAdd={(t) => updateBrand('brand_voice_adjectives', [...currentBrand.brand_voice_adjectives, t])} onRemove={(t) => updateBrand('brand_voice_adjectives', currentBrand.brand_voice_adjectives.filter(x => x !== t))} />
+                                                <TagInput label="No-Go Wörter" icon="Trash2" tags={currentBrand.no_go_words} colorClass="bg-red-50" onAdd={(t) => updateBrand('no_go_words', [...currentBrand.no_go_words, t])} onRemove={(t) => updateBrand('no_go_words', currentBrand.no_go_words.filter(x => x !== t))} />
+                                                <InputField label="CTA" value={currentBrand.cta} onChange={(v) => updateBrand('cta', v)} />
                                             </div>
                                         </div>
                                     </div>
@@ -327,46 +310,28 @@ KOMM DIREKT ZUM ERGEBNIS OHNE SMALLTALK.
 
                                 {activeTab === 'campaign' && (
                                     <div className="space-y-12 animate-in">
-                                        <div>
-                                            <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie Setup</h2>
-                                            <p className="text-slate-400 font-medium mt-1">Konfiguriere das Ziel deiner aktuellen Kampagne.</p>
-                                        </div>
-
+                                        <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie Setup</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                             <div className="bg-slate-50 p-10 rounded-[3rem] border border-slate-200 space-y-8">
                                                 <h3 className="text-[#103030] font-black uppercase text-xs tracking-[0.2em]">Funnel Stage</h3>
                                                 <div className="grid grid-cols-1 gap-3">
                                                     {['awareness', 'consideration', 'conversion'].map(stage => (
-                                                        <button
-                                                            key={stage}
-                                                            onClick={() => setCampaign({...campaign, funnel_stage: stage})}
-                                                            className={`py-4 px-6 text-xs font-black uppercase tracking-widest rounded-2xl border-2 transition-all ${
-                                                                campaign.funnel_stage === stage 
-                                                                ? 'bg-[#103030] border-[#103030] text-[#F8D800]' 
-                                                                : 'bg-white border-slate-200 text-slate-400'
-                                                            }`}
-                                                        >
+                                                        <button key={stage} onClick={() => updateCampaign('funnel_stage', stage)} className={`py-4 px-6 text-xs font-black uppercase tracking-widest rounded-2xl border-2 transition-all ${campaign.funnel_stage === stage ? 'bg-[#103030] border-[#103030] text-[#F8D800]' : 'bg-white border-slate-200 text-slate-400'}`}>
                                                             {stage}
                                                         </button>
                                                     ))}
                                                 </div>
                                             </div>
                                             <div className="space-y-8">
-                                                <InputField label="Kampagnen-Ziel" icon="Flag" value={campaign.objective} onChange={(v) => setCampaign({...campaign, objective: v})} />
-                                                <InputField label="Zielgruppen-Segment" icon="UserPlus" value={campaign.audience_segment} onChange={(v) => setCampaign({...campaign, audience_segment: v})} />
-                                                <InputField label="Content Pillar / Thema" icon="Layers" value={campaign.content_pillar} onChange={(v) => setCampaign({...campaign, content_pillar: v})} />
-                                                
+                                                <InputField label="Kampagnen-Ziel" icon="Flag" value={campaign.objective} onChange={(v) => updateCampaign('objective', v)} />
+                                                <InputField label="Segment" value={campaign.audience_segment} onChange={(v) => updateCampaign('audience_segment', v)} />
+                                                <InputField label="Inhaltstyp" value={campaign.content_pillar} onChange={(v) => updateCampaign('content_pillar', v)} />
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Tonalität (Vibe)</label>
-                                                    <select 
-                                                        value={campaign.tone}
-                                                        onChange={(e) => setCampaign({...campaign, tone: e.target.value})}
-                                                        className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-bold uppercase text-xs focus:outline-none focus:border-[#103030]"
-                                                    >
-                                                        <option value="bold">Bold & Direct</option>
-                                                        <option value="empathic">Empathisch & Nahbar</option>
-                                                        <option value="authoritative">Autoritär & Kompetent</option>
-                                                        <option value="playful">Verspielt & Kreativ</option>
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Vibe</label>
+                                                    <select value={campaign.tone} onChange={(e) => updateCampaign('tone', e.target.value)} className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-bold uppercase text-xs focus:outline-none focus:border-[#103030]">
+                                                        <option value="bold">Bold</option>
+                                                        <option value="empathic">Empathisch</option>
+                                                        <option value="authoritative">Kompetent</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -380,16 +345,10 @@ KOMM DIREKT ZUM ERGEBNIS OHNE SMALLTALK.
                                             <Icon name="Zap" size={40} className="text-[#F8D800] fill-[#F8D800]" />
                                         </div>
                                         <h2 className="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Prompt Engine</h2>
-                                        <p className="text-slate-400 max-w-lg mb-12 font-medium">Alle Markendaten werden jetzt zu einem hochspezifischen Master-Prompt mit Story-Frameworks verarbeitet.</p>
-                                        
-                                        <button 
-                                           onClick={handleGeneratePrompt}
-                                           className="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4"
-                                        >
+                                        <button onClick={handleGeneratePrompt} className="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4">
                                             <Icon name={copied ? "CheckCircle" : "Zap"} size={28} />
-                                            <span>{copied ? "Kopiert & Bereit!" : "Master-Prompt erstellen"}</span>
+                                            <span>{copied ? "Kopiert!" : "Erstellen"}</span>
                                         </button>
-
                                         {generatedPrompt && (
                                             <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-3xl text-left font-mono text-[10px] text-slate-500 whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scroll shadow-inner">
                                                 {generatedPrompt}
