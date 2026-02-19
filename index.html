@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Lucide Icons - GitHub-stabile Einbindung -->
+    <!-- Lucide Icons - GitHub-stabile Einbindung via Vanilla-JS Bridge -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
@@ -25,7 +25,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Custom Scrollbar für die Prompt-Area */
         .custom-scroll::-webkit-scrollbar {
             width: 4px;
         }
@@ -45,28 +44,27 @@
         const { useState, useEffect, useRef } = React;
         
         /**
-         * Da lucide-react in CDN-Umgebungen oft forwardRef-Fehler wirft,
-         * nutzen wir hier eine kleine Wrapper-Komponente, die die Vanilla-Lucide-Engine nutzt.
-         * Das ist die stabilste Methode für GitHub Pages & Co.
+         * Icon Wrapper für maximale Kompatibilität in CDN/GitHub Umgebungen
          */
         const Icon = ({ name, size = 20, className = "" }) => {
             const iconRef = useRef(null);
-            
             useEffect(() => {
-                if (iconRef.current) {
-                    iconRef.current.innerHTML = ''; // Clear previous
-                    const iconElement = lucide.createIcons({
-                        icons: { [name]: lucide.icons[name] },
-                        attrs: { 
-                            strokeWidth: 2,
-                            width: size,
-                            height: size,
-                            class: className
-                        }
-                    });
+                if (iconRef.current && window.lucide) {
+                    iconRef.current.innerHTML = '';
+                    const iconData = lucide.icons[name];
+                    if (iconData) {
+                        const iconElement = lucide.createIcons({
+                            icons: { [name]: iconData },
+                            attrs: { 
+                                strokeWidth: 2,
+                                width: size,
+                                height: size,
+                                class: className
+                            }
+                        });
+                    }
                 }
             }, [name, size, className]);
-
             return <span ref={iconRef} className="inline-flex items-center justify-center"></span>;
         };
 
@@ -88,21 +86,24 @@
                 brand_id: 'brand_001',
                 brand_name: 'Stitch & Line',
                 offer: 'Individuelle T‑Shirt-Designs für Creator in 72 Stunden.',
-                audience: 'Creator und kleine E‑Com Brands.',
+                audience: 'Creator und kleine E‑Com Brands (1–5 Personen).',
                 primary_goal: 'leads',
-                usp_1: '72h Delivery',
-                usp_2: 'Stil-Check Garantie',
-                usp_3: 'Print-Ready Files',
+                channels: ['Instagram', 'TikTok'],
+                usp_1: '72h Delivery: Druckdateien + Mockups',
+                usp_2: 'Stil-Check: Designs passen zum Brand-Style',
+                usp_3: 'Merch-Conversion Fokus',
                 brand_voice_adjectives: ['klar', 'direkt', 'kreativ'],
-                no_go_words: ['revolutionär', 'bahnbrechend'],
-                cta: 'Schreib „MERCH“ per DM.'
+                no_go_words: ['revolutionär', 'bahnbrechend', 'entdecken'],
+                cta: 'Schreib „MERCH“ per DM.',
+                competitors: ['Fiverr Designer', 'Canva Templates']
             });
 
             const [campaign, setCampaign] = useState({
-                objective: '',
+                objective: 'Mehr qualifizierte Anfragen per DM',
                 funnel_stage: 'consideration',
                 tone: 'bold',
-                content_pillar: '',
+                content_pillar: 'Social Proof / Case Studies',
+                audience_segment: 'Creator ohne Design-Skills'
             });
 
             const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -114,23 +115,30 @@
 ROLLE: Senior Content-Stratege & Copywriter.
 MARKE: ${currentBrand.brand_name}
 ANGEBOT: ${currentBrand.offer}
-ZIELGRUPPE: ${currentBrand.audience}
-USPs: ${currentBrand.usp_1}, ${currentBrand.usp_2}, ${currentBrand.usp_3}
-TONALITÄT: ${currentBrand.brand_voice_adjectives.join(', ')} (${campaign.tone})
-PHASE: ${campaign.funnel_stage}
-THEMA: ${campaign.content_pillar}
+ZIELGRUPPE: ${currentBrand.audience} (Segment: ${campaign.audience_segment})
+KANÄLE: ${currentBrand.channels.join(', ')}
+WETTBEWERBER (ABGRENZUNG): ${currentBrand.competitors.join(', ')}
+
+USPs: 
+1. ${currentBrand.usp_1}
+2. ${currentBrand.usp_2}
+3. ${currentBrand.usp_3}
+
+TONALITÄT: ${currentBrand.brand_voice_adjectives.join(', ')} (Vibe: ${campaign.tone})
+FUNNEL-PHASE: ${campaign.funnel_stage}
+FOKUS-THEMA: ${campaign.content_pillar}
+ZIEL DER KAMPAGNE: ${campaign.objective}
 CTA: ${currentBrand.cta}
 
 AUFGABE: Erstelle Content, der die oben genannten Punkte berücksichtigt.
 
 STRENGSTE ANTI-GENERIC REGELN:
 ${ANTI_GENERIC_RULES.map(rule => `- ${rule}`).join('\n')}
-NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
+NO-GO WÖRTER (STRIKT VERBOTEN): ${currentBrand.no_go_words.join(', ')}
                 `.trim();
 
                 setGeneratedPrompt(prompt);
                 
-                // Clipboard API (Fallback für iFrames)
                 const textArea = document.createElement("textarea");
                 textArea.value = prompt;
                 document.body.appendChild(textArea);
@@ -175,7 +183,7 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                 </div>
             );
 
-            const TagInput = ({ label, tags, onAdd, onRemove, icon }) => {
+            const TagInput = ({ label, tags, onAdd, onRemove, icon, colorClass = "bg-slate-100" }) => {
                 const [val, setVal] = useState('');
                 return (
                     <div className="space-y-3">
@@ -189,7 +197,7 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                                 onChange={(e) => setVal(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter' && val) { onAdd(val); setVal(''); }}}
                                 className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
-                                placeholder="Hinzufügen..."
+                                placeholder="Neu..."
                             />
                             <button 
                                 onClick={() => { if(val) { onAdd(val); setVal(''); }}}
@@ -200,10 +208,10 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                         </div>
                         <div className="flex flex-wrap gap-2 pt-2">
                             {tags.map((tag, i) => (
-                                <span key={i} className="flex items-center gap-2 bg-slate-100 text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <span key={i} className={`flex items-center gap-2 ${colorClass} text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider`}>
                                     {tag}
                                     <button onClick={() => onRemove(tag)} className="hover:text-red-500 transition-colors">
-                                        <Icon name="Trash2" size={12} />
+                                        <Icon name="X" size={12} />
                                     </button>
                                 </span>
                             ))}
@@ -238,33 +246,29 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="w-2 h-2 rounded-full bg-[#F8D800] animate-pulse"></div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F8D800]">Aktiv</span>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F8D800]">Live Profile</span>
                                     </div>
-                                    <p className="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name || 'Leer'}</p>
+                                    <p className="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name || 'Marke fehlt'}</p>
                                     <p className="text-[11px] text-slate-400 font-medium line-clamp-2 italic">"{currentBrand.offer}"</p>
                                 </div>
                             </div>
                         </aside>
 
                         {/* Main Content Area */}
-                        <main className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden flex flex-col min-h-[800px]">
+                        <main className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden flex flex-col min-h-[850px]">
                             <div className="p-10 md:p-14 flex-grow">
                                 
                                 {activeTab === 'brand' && (
                                     <div className="space-y-12 animate-in">
                                         <div>
                                             <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
-                                            <p className="text-slate-400 font-medium mt-1">Konfiguriere das Fundament deiner Marke.</p>
+                                            <p className="text-slate-400 font-medium mt-1">Definiere das genetische Profil deiner Marke.</p>
                                         </div>
 
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                             <div className="space-y-8">
-                                                <InputField 
-                                                    label="Markenname" 
-                                                    icon="Briefcase"
-                                                    value={currentBrand.brand_name} 
-                                                    onChange={(val) => setCurrentBrand({...currentBrand, brand_name: val})} 
-                                                />
+                                                <InputField label="Markenname" icon="Briefcase" value={currentBrand.brand_name} onChange={(v) => setCurrentBrand({...currentBrand, brand_name: v})} />
+                                                <InputField label="Zielgruppe (Basis)" icon="Users" value={currentBrand.audience} onChange={(v) => setCurrentBrand({...currentBrand, audience: v})} />
                                                 <div className="space-y-2">
                                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
                                                         <Icon name="Megaphone" size={12} className="opacity-40" /> Core-Angebot
@@ -272,24 +276,38 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                                                     <textarea 
                                                         value={currentBrand.offer}
                                                         onChange={(e) => setCurrentBrand({...currentBrand, offer: e.target.value})}
-                                                        className="w-full h-32 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
+                                                        className="w-full h-24 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
                                                     />
+                                                </div>
+                                                <div className="grid grid-cols-1 gap-4">
+                                                    <InputField label="USP 1" value={currentBrand.usp_1} onChange={(v) => setCurrentBrand({...currentBrand, usp_1: v})} />
+                                                    <InputField label="USP 2" value={currentBrand.usp_2} onChange={(v) => setCurrentBrand({...currentBrand, usp_2: v})} />
+                                                    <InputField label="USP 3" value={currentBrand.usp_3} onChange={(v) => setCurrentBrand({...currentBrand, usp_3: v})} />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-8">
-                                                <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
-                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#103030]">Key-Differenzierung</h3>
-                                                    <InputField label="USP 01" value={currentBrand.usp_1} onChange={(val) => setCurrentBrand({...currentBrand, usp_1: val})} />
-                                                    <InputField label="USP 02" value={currentBrand.usp_2} onChange={(val) => setCurrentBrand({...currentBrand, usp_2: val})} />
-                                                </div>
                                                 <TagInput 
-                                                    label="No-Go Wörter" 
-                                                    icon="Trash2"
-                                                    tags={currentBrand.no_go_words}
-                                                    onAdd={(tag) => setCurrentBrand({...currentBrand, no_go_words: [...currentBrand.no_go_words, tag]})}
-                                                    onRemove={(tag) => setCurrentBrand({...currentBrand, no_go_words: currentBrand.no_go_words.filter(t => t !== tag)})}
+                                                    label="Kanäle" icon="Share2" tags={currentBrand.channels}
+                                                    onAdd={(t) => setCurrentBrand({...currentBrand, channels: [...currentBrand.channels, t]})}
+                                                    onRemove={(t) => setCurrentBrand({...currentBrand, channels: currentBrand.channels.filter(x => x !== t)})}
                                                 />
+                                                <TagInput 
+                                                    label="Wettbewerber" icon="Target" tags={currentBrand.competitors}
+                                                    onAdd={(t) => setCurrentBrand({...currentBrand, competitors: [...currentBrand.competitors, t]})}
+                                                    onRemove={(t) => setCurrentBrand({...currentBrand, competitors: currentBrand.competitors.filter(x => x !== t)})}
+                                                />
+                                                <TagInput 
+                                                    label="Brand Voice (Adjektive)" icon="Mic" tags={currentBrand.brand_voice_adjectives} colorClass="bg-[#F8D800]/20"
+                                                    onAdd={(t) => setCurrentBrand({...currentBrand, brand_voice_adjectives: [...currentBrand.brand_voice_adjectives, t]})}
+                                                    onRemove={(t) => setCurrentBrand({...currentBrand, brand_voice_adjectives: currentBrand.brand_voice_adjectives.filter(x => x !== t)})}
+                                                />
+                                                <TagInput 
+                                                    label="No-Go Wörter" icon="Trash2" tags={currentBrand.no_go_words} colorClass="bg-red-50"
+                                                    onAdd={(t) => setCurrentBrand({...currentBrand, no_go_words: [...currentBrand.no_go_words, t]})}
+                                                    onRemove={(t) => setCurrentBrand({...currentBrand, no_go_words: currentBrand.no_go_words.filter(x => x !== t)})}
+                                                />
+                                                <InputField label="Standard CTA" icon="MessageSquare" value={currentBrand.cta} onChange={(v) => setCurrentBrand({...currentBrand, cta: v})} />
                                             </div>
                                         </div>
                                     </div>
@@ -297,10 +315,14 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
 
                                 {activeTab === 'campaign' && (
                                     <div className="space-y-12 animate-in">
-                                        <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie</h2>
+                                        <div>
+                                            <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie Setup</h2>
+                                            <p className="text-slate-400 font-medium mt-1">Konfiguriere das Ziel deiner aktuellen Kampagne.</p>
+                                        </div>
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="bg-white p-10 rounded-[3rem] border-2 border-slate-100 shadow-sm space-y-8">
-                                                <h3 className="text-[#103030] font-black uppercase text-xs tracking-[0.2em]">Funnel Logik</h3>
+                                            <div className="bg-slate-50 p-10 rounded-[3rem] border border-slate-200 space-y-8">
+                                                <h3 className="text-[#103030] font-black uppercase text-xs tracking-[0.2em]">Funnel Stage</h3>
                                                 <div className="grid grid-cols-1 gap-3">
                                                     {['awareness', 'consideration', 'conversion'].map(stage => (
                                                         <button
@@ -309,7 +331,7 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                                                             className={`py-4 px-6 text-xs font-black uppercase tracking-widest rounded-2xl border-2 transition-all ${
                                                                 campaign.funnel_stage === stage 
                                                                 ? 'bg-[#103030] border-[#103030] text-[#F8D800]' 
-                                                                : 'bg-slate-50 border-slate-50 text-slate-400'
+                                                                : 'bg-white border-slate-200 text-slate-400'
                                                             }`}
                                                         >
                                                             {stage}
@@ -318,8 +340,23 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                                                 </div>
                                             </div>
                                             <div className="space-y-8">
-                                                <InputField label="Content Pillar" value={campaign.content_pillar} onChange={(val) => setCampaign({...campaign, content_pillar: val})} />
-                                                <InputField label="Kampagnen Ziel" value={campaign.objective} onChange={(val) => setCampaign({...campaign, objective: val})} />
+                                                <InputField label="Kampagnen-Ziel" icon="Flag" value={campaign.objective} onChange={(v) => setCampaign({...campaign, objective: v})} />
+                                                <InputField label="Zielgruppen-Segment" icon="UserPlus" value={campaign.audience_segment} onChange={(v) => setCampaign({...campaign, audience_segment: v})} />
+                                                <InputField label="Content Pillar / Thema" icon="Layers" value={campaign.content_pillar} onChange={(v) => setCampaign({...campaign, content_pillar: v})} />
+                                                
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Tonalität (Vibe)</label>
+                                                    <select 
+                                                        value={campaign.tone}
+                                                        onChange={(e) => setCampaign({...campaign, tone: e.target.value})}
+                                                        className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-bold uppercase text-xs focus:outline-none focus:border-[#103030]"
+                                                    >
+                                                        <option value="bold">Bold & Direct</option>
+                                                        <option value="empathic">Empathisch & Nahbar</option>
+                                                        <option value="authoritative">Autoritär & Kompetent</option>
+                                                        <option value="playful">Verspielt & Kreativ</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -327,22 +364,22 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
 
                                 {activeTab === 'generator' && (
                                     <div className="h-full flex flex-col items-center justify-center text-center py-10 animate-in">
-                                        <div className="w-28 h-28 bg-[#103030] rounded-full flex items-center justify-center mb-8 shadow-2xl relative">
-                                            <Icon name="Zap" size={48} className="text-[#F8D800] fill-[#F8D800]" />
+                                        <div className="w-24 h-24 bg-[#103030] rounded-full flex items-center justify-center mb-8 shadow-2xl">
+                                            <Icon name="Zap" size={40} className="text-[#F8D800] fill-[#F8D800]" />
                                         </div>
-                                        <h2 className="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Master Prompt</h2>
-                                        <p className="text-slate-400 max-w-lg mb-12 font-medium">Bereit zum Kopieren in ChatGPT oder Claude.</p>
+                                        <h2 className="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Prompt Engine</h2>
+                                        <p className="text-slate-400 max-w-lg mb-12 font-medium">Alle Markendaten und Strategie-Parameter werden zu einem Master-Prompt zusammengeführt.</p>
                                         
                                         <button 
                                            onClick={handleGeneratePrompt}
                                            className="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4"
                                         >
                                             <Icon name={copied ? "CheckCircle" : "Zap"} size={28} />
-                                            <span>{copied ? "Prompt Kopiert!" : "Prompt Generieren"}</span>
+                                            <span>{copied ? "Kopiert!" : "Master-Prompt erstellen"}</span>
                                         </button>
 
                                         {generatedPrompt && (
-                                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-2xl text-left font-mono text-xs text-slate-500 whitespace-pre-wrap max-h-40 overflow-y-auto custom-scroll">
+                                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-3xl text-left font-mono text-[10px] text-slate-500 whitespace-pre-wrap max-h-[250px] overflow-y-auto custom-scroll shadow-inner">
                                                 {generatedPrompt}
                                             </div>
                                         )}
