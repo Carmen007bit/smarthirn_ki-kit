@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons - Fix: Benötigt eine spezifische Reihenfolge und Zugriffsmethode -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/lucide-react@latest"></script>
     
@@ -31,13 +31,20 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
+        
+        // Fix für Lucide Icons in der Browser-Umgebung
         const { 
             ShieldCheck, Target, PenTool, Zap, 
             Award, Briefcase, Megaphone, Trash2, 
             Plus, CheckCircle, ChevronRight 
-        } = lucideReact;
+        } = window.lucideReact || {};
 
         const App = () => {
+            // Falls Icons noch nicht geladen sind (Sicherheitscheck)
+            if (!window.lucideReact) {
+                return <div class="flex items-center justify-center min-h-screen text-slate-400 uppercase text-[10px] font-bold tracking-widest">Lade Engine...</div>;
+            }
+
             // --- Konfiguration & Konstanten ---
             const ANTI_GENERIC_RULES = [
                 "Keine leeren Claims (z.B. „innovativ“, „revolutionär“).",
@@ -96,7 +103,8 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                 `.trim();
 
                 setGeneratedPrompt(prompt);
-                // Fallback für Clipboard in iFrames
+                
+                // Kopier-Logik
                 const textArea = document.createElement("textarea");
                 textArea.value = prompt;
                 document.body.appendChild(textArea);
@@ -104,7 +112,7 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
                 try {
                     document.execCommand('copy');
                 } catch (err) {
-                    console.error('Fallback: Kopieren fehlgeschlagen', err);
+                    console.error('Kopieren fehlgeschlagen', err);
                 }
                 document.body.removeChild(textArea);
                 
@@ -116,28 +124,28 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
             const NavItem = ({ id, icon: Icon, label }) => (
                 <button
                     onClick={() => setActiveTab(id)}
-                    class={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all duration-300 group w-full text-left ${
+                    className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all duration-300 group w-full text-left ${
                         activeTab === id 
                             ? 'bg-[#103030] text-[#F8D800] shadow-xl scale-[1.02]' 
                             : 'text-slate-400 hover:bg-slate-100 hover:text-[#103030]'
                     }`}
                 >
-                    <Icon size={20} />
-                    <span class="font-black uppercase text-[11px] tracking-widest">{label}</span>
+                    {Icon && <Icon size={20} />}
+                    <span className="font-black uppercase text-[11px] tracking-widest">{label}</span>
                 </button>
             );
 
             const InputField = ({ label, value, onChange, placeholder, icon: Icon }) => (
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                        {Icon && <Icon size={12} class="opacity-40" />} {label}
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
+                        {Icon && <Icon size={12} className="opacity-40" />} {label}
                     </label>
                     <input
                         type="text"
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
                         placeholder={placeholder}
-                        class="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
+                        className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
                     />
                 </div>
             );
@@ -145,31 +153,31 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
             const TagInput = ({ label, tags, onAdd, onRemove, icon: Icon }) => {
                 const [val, setVal] = useState('');
                 return (
-                    <div class="space-y-3">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                            {Icon && <Icon size={12} class="opacity-40" />} {label}
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
+                            {Icon && <Icon size={12} className="opacity-40" />} {label}
                         </label>
-                        <div class="flex gap-2">
+                        <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={val}
                                 onChange={(e) => setVal(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter' && val) { onAdd(val); setVal(''); }}}
-                                class="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
+                                className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
                                 placeholder="Hinzufügen..."
                             />
                             <button 
                                 onClick={() => { if(val) { onAdd(val); setVal(''); }}}
-                                class="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg"
+                                className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg"
                             >
                                 <Plus size={24} />
                             </button>
                         </div>
-                        <div class="flex flex-wrap gap-2 pt-2">
+                        <div className="flex flex-wrap gap-2 pt-2">
                             {tags.map((tag, i) => (
-                                <span key={i} class="flex items-center gap-2 bg-slate-100 text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <span key={i} className="flex items-center gap-2 bg-slate-100 text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                     {tag}
-                                    <button onClick={() => onRemove(tag)} class="hover:text-red-500 transition-colors">
+                                    <button onClick={() => onRemove(tag)} className="hover:text-red-500 transition-colors">
                                         <Trash2 size={12} />
                                     </button>
                                 </span>
@@ -180,150 +188,12 @@ NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}
             };
 
             return (
-                <div class="min-h-screen p-4 md:p-10">
-                    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10">
+                <div className="min-h-screen p-4 md:p-10">
+                    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10">
                         
                         {/* Sidebar */}
-                        <aside class="space-y-10 flex flex-col">
-                            <div class="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center">
-                                <h1 class="text-2xl font-[900] tracking-tighter text-[#103030] uppercase leading-none">
-                                    SMART<span class="text-[#F8D800]">HIRN</span>
+                        <aside className="space-y-10 flex flex-col">
+                            <div className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center">
+                                <h1 className="text-2xl font-[900] tracking-tighter text-[#103030] uppercase leading-none">
+                                    SMART<span className="text-[#F8D800]">HIRN</span>
                                 </h1>
-                                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2">Strategy master v0.1</p>
-                            </div>
-
-                            <nav class="flex flex-col space-y-3">
-                                <NavItem id="brand" icon={ShieldCheck} label="Brand Identity" />
-                                <NavItem id="campaign" icon={Target} label="Strategie Setup" />
-                                <NavItem id="generator" icon={PenTool} label="Prompt Engine" />
-                            </nav>
-
-                            <div class="bg-[#103030] rounded-[2rem] p-7 text-white shadow-2xl mt-auto relative overflow-hidden group">
-                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                                    <Award size={80} />
-                                </div>
-                                <div class="relative z-10">
-                                    <div class="flex items-center gap-2 mb-4">
-                                        <div class="w-2 h-2 rounded-full bg-[#F8D800] animate-pulse"></div>
-                                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#F8D800]">Aktiv</span>
-                                    </div>
-                                    <p class="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name || 'Leer'}</p>
-                                    <p class="text-[11px] text-slate-400 font-medium line-clamp-2 italic">"{currentBrand.offer}"</p>
-                                </div>
-                            </div>
-                        </aside>
-
-                        {/* Main Content Area */}
-                        <main class="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden flex flex-col min-h-[800px]">
-                            <div class="p-10 md:p-14 flex-grow">
-                                
-                                {activeTab === 'brand' && (
-                                    <div class="space-y-12 animate-in">
-                                        <div>
-                                            <h2 class="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
-                                            <p class="text-slate-400 font-medium mt-1">Konfiguriere das Fundament deiner Marke.</p>
-                                        </div>
-
-                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                            <div class="space-y-8">
-                                                <InputField 
-                                                    label="Markenname" 
-                                                    icon={Briefcase}
-                                                    value={currentBrand.brand_name} 
-                                                    onChange={(val) => setCurrentBrand({...currentBrand, brand_name: val})} 
-                                                />
-                                                <div class="space-y-2">
-                                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                                                        <Megaphone size={12} class="opacity-40" /> Core-Angebot
-                                                    </label>
-                                                    <textarea 
-                                                        value={currentBrand.offer}
-                                                        onChange={(e) => setCurrentBrand({...currentBrand, offer: e.target.value})}
-                                                        class="w-full h-32 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div class="space-y-8">
-                                                <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
-                                                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-[#103030]">Key-Differenzierung</h3>
-                                                    <InputField label="USP 01" value={currentBrand.usp_1} onChange={(val) => setCurrentBrand({...currentBrand, usp_1: val})} />
-                                                    <InputField label="USP 02" value={currentBrand.usp_2} onChange={(val) => setCurrentBrand({...currentBrand, usp_2: val})} />
-                                                </div>
-                                                <TagInput 
-                                                    label="No-Go Wörter" 
-                                                    icon={Trash2}
-                                                    tags={currentBrand.no_go_words}
-                                                    onAdd={(tag) => setCurrentBrand({...currentBrand, no_go_words: [...currentBrand.no_go_words, tag]})}
-                                                    onRemove={(tag) => setCurrentBrand({...currentBrand, no_go_words: currentBrand.no_go_words.filter(t => t !== tag)})}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'campaign' && (
-                                    <div class="space-y-12 animate-in">
-                                        <h2 class="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie</h2>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div class="bg-white p-10 rounded-[3rem] border-2 border-slate-100 shadow-sm space-y-8">
-                                                <h3 class="text-[#103030] font-black uppercase text-xs tracking-[0.2em]">Funnel Logik</h3>
-                                                <div class="grid grid-cols-1 gap-3">
-                                                    {['awareness', 'consideration', 'conversion'].map(stage => (
-                                                        <button
-                                                            key={stage}
-                                                            onClick={() => setCampaign({...campaign, funnel_stage: stage})}
-                                                            class={`py-4 px-6 text-xs font-black uppercase tracking-widest rounded-2xl border-2 transition-all ${
-                                                                campaign.funnel_stage === stage 
-                                                                ? 'bg-[#103030] border-[#103030] text-[#F8D800]' 
-                                                                : 'bg-slate-50 border-slate-50 text-slate-400'
-                                                            }`}
-                                                        >
-                                                            {stage}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div class="space-y-8">
-                                                <InputField label="Content Pillar" value={campaign.content_pillar} onChange={(val) => setCampaign({...campaign, content_pillar: val})} />
-                                                <InputField label="Kampagnen Ziel" value={campaign.objective} onChange={(val) => setCampaign({...campaign, objective: val})} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'generator' && (
-                                    <div class="h-full flex flex-col items-center justify-center text-center py-10 animate-in">
-                                        <div class="w-28 h-28 bg-[#103030] rounded-full flex items-center justify-center mb-8 shadow-2xl relative">
-                                            <Zap size={48} class="text-[#F8D800] fill-[#F8D800]" />
-                                        </div>
-                                        <h2 class="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Master Prompt</h2>
-                                        <p class="text-slate-400 max-w-lg mb-12 font-medium">Bereit zum Kopieren in ChatGPT oder Claude.</p>
-                                        
-                                        <button 
-                                           onClick={handleGeneratePrompt}
-                                           class="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4"
-                                        >
-                                            {copied ? <CheckCircle size={28} /> : <Zap size={28} />}
-                                            <span>{copied ? "Prompt Kopiert!" : "Prompt Generieren"}</span>
-                                        </button>
-
-                                        {generatedPrompt && (
-                                            <div class="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-2xl text-left font-mono text-xs text-slate-500 whitespace-pre-wrap max-h-40 overflow-y-auto">
-                                                {generatedPrompt}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </main>
-                    </div>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
