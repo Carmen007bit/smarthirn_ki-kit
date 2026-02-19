@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Lucide Icons - GitHub-stabile Einbindung via Vanilla-JS Bridge -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
@@ -44,7 +44,7 @@
         const { useState, useEffect, useRef } = React;
         
         /**
-         * Icon Wrapper für maximale Kompatibilität in CDN/GitHub Umgebungen
+         * Icon Wrapper für maximale Kompatibilität
          */
         const Icon = ({ name, size = 20, className = "" }) => {
             const iconRef = useRef(null);
@@ -73,11 +73,12 @@
             const ANTI_GENERIC_RULES = [
                 "Keine leeren Claims (z.B. „innovativ“, „revolutionär“).",
                 "Keine Floskeln wie „Entdecke“ oder „In diesem Beitrag“.",
-                "Konkrete Beispiele und Zahlen einbauen.",
-                "Kurze Sätze. Aktiv statt Passiv.",
-                "Brand Voice konsequent einhalten.",
+                "Konkrete Beispiele und Zahlen einbauen (statt 'viele' schreib '126').",
+                "Kurze Sätze. Aktiv statt Passiv. Direkte Ansprache.",
+                "Brand Voice konsequent einhalten: Weniger Marketing-Bla, mehr Experten-Expertise.",
                 "No-Go-Wörter strikt vermeiden.",
-                "Keine Emojis, außer ausdrücklich gewünscht."
+                "Keine Emojis, außer ausdrücklich gewünscht.",
+                "Verwende das 'Problem-Agitation-Solution' Framework für Captions."
             ];
 
             // --- State Management ---
@@ -100,7 +101,7 @@
 
             const [campaign, setCampaign] = useState({
                 objective: 'Mehr qualifizierte Anfragen per DM',
-                funnel_stage: 'consideration',
+                funnel_stage: 'conversion',
                 tone: 'bold',
                 content_pillar: 'Social Proof / Case Studies',
                 audience_segment: 'Creator ohne Design-Skills'
@@ -109,36 +110,47 @@
             const [generatedPrompt, setGeneratedPrompt] = useState('');
             const [copied, setCopied] = useState(false);
 
-            // --- Logik: Prompt Generation ---
+            // --- Logik: Prompt Generation (VERBESSERT & EXAKTER) ---
             const handleGeneratePrompt = () => {
                 const prompt = `
-ROLLE: Senior Content-Stratege & Copywriter.
-MARKE: ${currentBrand.brand_name}
-ANGEBOT: ${currentBrand.offer}
-ZIELGRUPPE: ${currentBrand.audience} (Segment: ${campaign.audience_segment})
-KANÄLE: ${currentBrand.channels.join(', ')}
-WETTBEWERBER (ABGRENZUNG): ${currentBrand.competitors.join(', ')}
+ROLLE: Du bist ein Senior Content-Stratege und psychologisch geschulter Copywriter. Dein Fokus liegt auf Performance-Marketing und markenspezifischem Storytelling.
 
-USPs: 
+KONTEXT:
+- MARKE: ${currentBrand.brand_name}
+- ANGEBOT: ${currentBrand.offer}
+- ZIELGRUPPE: ${currentBrand.audience} (Speziell: ${campaign.audience_segment})
+- KANÄLE: ${currentBrand.channels.join(', ')}
+- WETTBEWERBER-KONTEXT: Wir müssen uns klar gegen ${currentBrand.competitors.join(' und ')} abheben (Qualität vs. Preis/Schnelligkeit).
+
+STRATEGISCHE PARAMETER:
+- FUNNEL-PHASE: ${campaign.funnel_stage.toUpperCase()} (Übersetze dies in psychologische Trigger: ${campaign.funnel_stage === 'conversion' ? 'Dringlichkeit, Beweislast, Einwandbehandlung' : 'Problemerkennung & Autorität'})
+- FOKUS-THEMA: ${campaign.content_pillar}
+- TONALITÄT: ${currentBrand.brand_voice_adjectives.join(', ')} (Vibe: ${campaign.tone})
+
+WICHTIGSTE USPs (Baue diese zwingend ein):
 1. ${currentBrand.usp_1}
 2. ${currentBrand.usp_2}
 3. ${currentBrand.usp_3}
 
-TONALITÄT: ${currentBrand.brand_voice_adjectives.join(', ')} (Vibe: ${campaign.tone})
-FUNNEL-PHASE: ${campaign.funnel_stage}
-FOKUS-THEMA: ${campaign.content_pillar}
-ZIEL DER KAMPAGNE: ${campaign.objective}
-CTA: ${currentBrand.cta}
+AUFGABE: Erstelle hochspezifischen Content für ${currentBrand.channels.join(' und ')}. 
 
-AUFGABE: Erstelle Content, der die oben genannten Punkte berücksichtigt.
+STRUKTUR-VORGABEN FÜR DEN OUTPUT:
+1. REEL/TIKTOK SKRIPTE: Nutze das Framework [HOOK -> AGITATION -> PROOF -> CTA]. Gib exakte Anweisungen für On-Screen Text (OST) und Voiceover (VO).
+2. CAROUSEL-SLIDES: Definiere jede Slide einzeln. Slide 1 muss eine 'Pattern-Interrupt' Headline haben.
+3. CAPTIONS: Schreibe kurze, 'punchy' Captions. Keine Einleitung, direkt zum Punkt.
+4. DM-STRATEGIE: Wie reagieren wir auf den CTA "${currentBrand.cta}"?
 
-STRENGSTE ANTI-GENERIC REGELN:
+STRENGSTE REGELN GEGEN GENERISCHEN OUTPUT:
 ${ANTI_GENERIC_RULES.map(rule => `- ${rule}`).join('\n')}
-NO-GO WÖRTER (STRIKT VERBOTEN): ${currentBrand.no_go_words.join(', ')}
+- VERBOTENE WÖRTER: ${currentBrand.no_go_words.join(', ')}
+- VERMEIDE ADJEKTIVE WIE "EINZIGARTIG" ODER "HOCHWERTIG". ZEIGE ES DURCH DATEN ODER PROZESSE.
+
+KOMM DIREKT ZUM ERGEBNIS OHNE SMALLTALK.
                 `.trim();
 
                 setGeneratedPrompt(prompt);
                 
+                // Clipboard fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = prompt;
                 document.body.appendChild(textArea);
@@ -298,7 +310,7 @@ NO-GO WÖRTER (STRIKT VERBOTEN): ${currentBrand.no_go_words.join(', ')}
                                                     onRemove={(t) => setCurrentBrand({...currentBrand, competitors: currentBrand.competitors.filter(x => x !== t)})}
                                                 />
                                                 <TagInput 
-                                                    label="Brand Voice (Adjektive)" icon="Mic" tags={currentBrand.brand_voice_adjectives} colorClass="bg-[#F8D800]/20"
+                                                    label="Brand Voice" icon="Mic" tags={currentBrand.brand_voice_adjectives} colorClass="bg-[#F8D800]/20"
                                                     onAdd={(t) => setCurrentBrand({...currentBrand, brand_voice_adjectives: [...currentBrand.brand_voice_adjectives, t]})}
                                                     onRemove={(t) => setCurrentBrand({...currentBrand, brand_voice_adjectives: currentBrand.brand_voice_adjectives.filter(x => x !== t)})}
                                                 />
@@ -368,18 +380,18 @@ NO-GO WÖRTER (STRIKT VERBOTEN): ${currentBrand.no_go_words.join(', ')}
                                             <Icon name="Zap" size={40} className="text-[#F8D800] fill-[#F8D800]" />
                                         </div>
                                         <h2 className="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Prompt Engine</h2>
-                                        <p className="text-slate-400 max-w-lg mb-12 font-medium">Alle Markendaten und Strategie-Parameter werden zu einem Master-Prompt zusammengeführt.</p>
+                                        <p className="text-slate-400 max-w-lg mb-12 font-medium">Alle Markendaten werden jetzt zu einem hochspezifischen Master-Prompt mit Story-Frameworks verarbeitet.</p>
                                         
                                         <button 
                                            onClick={handleGeneratePrompt}
                                            className="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4"
                                         >
                                             <Icon name={copied ? "CheckCircle" : "Zap"} size={28} />
-                                            <span>{copied ? "Kopiert!" : "Master-Prompt erstellen"}</span>
+                                            <span>{copied ? "Kopiert & Bereit!" : "Master-Prompt erstellen"}</span>
                                         </button>
 
                                         {generatedPrompt && (
-                                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-3xl text-left font-mono text-[10px] text-slate-500 whitespace-pre-wrap max-h-[250px] overflow-y-auto custom-scroll shadow-inner">
+                                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-3xl text-left font-mono text-[10px] text-slate-500 whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scroll shadow-inner">
                                                 {generatedPrompt}
                                             </div>
                                         )}
