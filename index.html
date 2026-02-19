@@ -8,13 +8,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel Standalone -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -30,93 +23,150 @@
 <body class="bg-[#F9FAFB]">
     <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+    <!-- React & ReactDOM via ES Modules -->
+    <script type="module">
+        import React from 'https://esm.sh/react@18.2.0';
+        import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
+
+        const { useState } = React;
         
-        // Lucide Icons als SVG-Komponenten definieren (inline, da CDN problematisch ist)
-        const ShieldCheck = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <path d="m9 12 2 2 4-4"></path>
-            </svg>
+        // SVG Icon Components
+        const ShieldCheck = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2",
+            strokeLinecap: "round",
+            strokeLinejoin: "round"
+        }, 
+            React.createElement('path', { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" }),
+            React.createElement('path', { d: "m9 12 2 2 4-4" })
         );
 
-        const Target = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-            </svg>
+        const Target = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('circle', { cx: "12", cy: "12", r: "10" }),
+            React.createElement('circle', { cx: "12", cy: "12", r: "6" }),
+            React.createElement('circle', { cx: "12", cy: "12", r: "2" })
         );
 
-        const PenTool = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="m12 19 7-7 3 3-7 7-3-3z"></path>
-                <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-                <path d="m2 2 7.586 7.586"></path>
-                <circle cx="11" cy="11" r="2"></circle>
-            </svg>
+        const PenTool = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('path', { d: "m12 19 7-7 3 3-7 7-3-3z" }),
+            React.createElement('path', { d: "m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" }),
+            React.createElement('circle', { cx: "11", cy: "11", r: "2" })
         );
 
-        const Zap = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
+        const Zap = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('polygon', { points: "13 2 3 14 12 14 11 22 21 10 12 10 13 2" })
         );
 
-        const Award = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <circle cx="12" cy="8" r="6"></circle>
-                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
-            </svg>
+        const Award = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('circle', { cx: "12", cy: "8", r: "6" }),
+            React.createElement('path', { d: "M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" })
         );
 
-        const Briefcase = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-            </svg>
+        const Briefcase = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('rect', { x: "2", y: "7", width: "20", height: "14", rx: "2" }),
+            React.createElement('path', { d: "M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" })
         );
 
-        const Megaphone = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="m3 11 18-5v12L3 14v-3z"></path>
-                <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
-            </svg>
+        const Megaphone = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('path', { d: "m3 11 18-5v12L3 14v-3z" }),
+            React.createElement('path', { d: "M11.6 16.8a3 3 0 1 1-5.8-1.6" })
         );
 
-        const Trash2 = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M3 6h18"></path>
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                <line x1="10" x2="10" y1="11" y2="17"></line>
-                <line x1="14" x2="14" y1="11" y2="17"></line>
-            </svg>
+        const Trash2 = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('path', { d: "M3 6h18" }),
+            React.createElement('path', { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" }),
+            React.createElement('path', { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" })
         );
 
-        const Plus = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <line x1="12" x2="12" y1="5" y2="19"></line>
-                <line x1="5" x2="19" y1="12" y2="12"></line>
-            </svg>
+        const Plus = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('line', { x1: "12", x2: "12", y1: "5", y2: "19" }),
+            React.createElement('line', { x1: "5", x2: "19", y1: "12", y2: "12" })
         );
 
-        const CheckCircle = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
+        const CheckCircle = ({ size = 20 }) => React.createElement('svg', {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: size,
+            height: size,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2"
+        },
+            React.createElement('path', { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+            React.createElement('polyline', { points: "22 4 12 14.01 9 11.01" })
         );
 
-        const ChevronRight = ({ size = 20, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-        );
-        
-        const App = () => {
-            // --- Konfiguration & Konstanten ---
+        // Main App Component
+        function App() {
             const ANTI_GENERIC_RULES = [
                 "Keine leeren Claims (z.B. „innovativ", „revolutionär").",
                 "Keine Floskeln wie „Entdecke" oder „In diesem Beitrag".",
@@ -127,19 +177,16 @@
                 "Keine Emojis, außer ausdrücklich gewünscht."
             ];
 
-            // --- State Management ---
             const [activeTab, setActiveTab] = useState('brand');
             const [currentBrand, setCurrentBrand] = useState({
                 brand_id: 'brand_001',
                 brand_name: 'Stitch & Line',
                 offer: 'Individuelle T‑Shirt-Designs für Creator in 72 Stunden.',
                 audience: 'Creator und kleine E‑Com Brands.',
-                primary_goal: 'leads',
                 usp_1: '72h Delivery',
                 usp_2: 'Stil-Check Garantie',
-                usp_3: 'Print-Ready Files',
-                brand_voice_adjectives: ['klar', 'direkt', 'kreativ'],
                 no_go_words: ['revolutionär', 'bahnbrechend'],
+                brand_voice_adjectives: ['klar', 'direkt', 'kreativ'],
                 cta: 'Schreib „MERCH" per DM.'
             });
 
@@ -153,13 +200,12 @@
             const [generatedPrompt, setGeneratedPrompt] = useState('');
             const [copied, setCopied] = useState(false);
 
-            // --- Logik: Prompt Generation ---
             const handleGeneratePrompt = () => {
                 const prompt = `ROLLE: Senior Content-Stratege & Copywriter.
 MARKE: ${currentBrand.brand_name}
 ANGEBOT: ${currentBrand.offer}
 ZIELGRUPPE: ${currentBrand.audience}
-USPs: ${currentBrand.usp_1}, ${currentBrand.usp_2}, ${currentBrand.usp_3}
+USPs: ${currentBrand.usp_1}, ${currentBrand.usp_2}
 TONALITÄT: ${currentBrand.brand_voice_adjectives.join(', ')} (${campaign.tone})
 PHASE: ${campaign.funnel_stage}
 THEMA: ${campaign.content_pillar}
@@ -172,228 +218,107 @@ ${ANTI_GENERIC_RULES.map(rule => `- ${rule}`).join('\n')}
 NO-GO WÖRTER (NICHT VERWENDEN): ${currentBrand.no_go_words.join(', ')}`;
 
                 setGeneratedPrompt(prompt);
-                
-                // Moderne Clipboard API
                 navigator.clipboard.writeText(prompt).then(() => {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
-                }).catch(err => {
-                    console.error('Kopieren fehlgeschlagen', err);
                 });
             };
 
-            // --- UI Komponenten ---
-            const NavItem = ({ id, icon: Icon, label }) => (
-                <button
-                    onClick={() => setActiveTab(id)}
-                    className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all duration-300 group w-full text-left ${
-                        activeTab === id 
-                            ? 'bg-[#103030] text-[#F8D800] shadow-xl scale-[1.02]' 
-                            : 'text-slate-400 hover:bg-slate-100 hover:text-[#103030]'
-                    }`}
-                >
-                    <Icon size={20} />
-                    <span className="font-black uppercase text-[11px] tracking-widest">{label}</span>
-                </button>
-            );
-
-            const InputField = ({ label, value, onChange, placeholder, icon: Icon }) => (
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                        {Icon && <Icon size={12} className="opacity-40" />} {label}
-                    </label>
-                    <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder={placeholder}
-                        className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
-                    />
-                </div>
-            );
-
-            const TagInput = ({ label, tags, onAdd, onRemove, icon: Icon }) => {
-                const [val, setVal] = useState('');
-                return (
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                            {Icon && <Icon size={12} className="opacity-40" />} {label}
-                        </label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={val}
-                                onChange={(e) => setVal(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter' && val) { onAdd(val); setVal(''); }}}
-                                className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
-                                placeholder="Hinzufügen..."
-                            />
-                            <button 
-                                onClick={() => { if(val) { onAdd(val); setVal(''); }}}
-                                className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg"
-                            >
-                                <Plus size={24} />
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-2">
-                            {tags.map((tag, i) => (
-                                <span key={i} className="flex items-center gap-2 bg-slate-100 text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-                                    {tag}
-                                    <button onClick={() => onRemove(tag)} className="hover:text-red-500 transition-colors">
-                                        <Trash2 size={12} />
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                );
-            };
-
-            return (
-                <div className="min-h-screen p-4 md:p-10">
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10">
+            return React.createElement('div', { className: 'min-h-screen p-4 md:p-10' },
+                React.createElement('div', { className: 'max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10' },
+                    
+                    // Sidebar
+                    React.createElement('aside', { className: 'space-y-10 flex flex-col' },
+                        React.createElement('div', { className: 'bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center' },
+                            React.createElement('h1', { className: 'text-2xl font-[900] tracking-tighter text-[#103030] uppercase leading-none' },
+                                'SMART',
+                                React.createElement('span', { className: 'text-[#F8D800]' }, 'HIRN')
+                            ),
+                            React.createElement('p', { className: 'text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2' }, 'Strategy master v0.1')
+                        ),
                         
-                        {/* Sidebar */}
-                        <aside className="space-y-10 flex flex-col">
-                            <div className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center">
-                                <h1 className="text-2xl font-[900] tracking-tighter text-[#103030] uppercase leading-none">
-                                    SMART<span className="text-[#F8D800]">HIRN</span>
-                                </h1>
-                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2">Strategy master v0.1</p>
-                            </div>
+                        React.createElement('nav', { className: 'flex flex-col space-y-3' },
+                            ['brand', 'campaign', 'generator'].map(tab => 
+                                React.createElement('button', {
+                                    key: tab,
+                                    onClick: () => setActiveTab(tab),
+                                    className: `flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all duration-300 w-full text-left ${
+                                        activeTab === tab 
+                                            ? 'bg-[#103030] text-[#F8D800] shadow-xl scale-[1.02]' 
+                                            : 'text-slate-400 hover:bg-slate-100 hover:text-[#103030]'
+                                    }`
+                                },
+                                    React.createElement(tab === 'brand' ? ShieldCheck : tab === 'campaign' ? Target : PenTool, { size: 20 }),
+                                    React.createElement('span', { className: 'font-black uppercase text-[11px] tracking-widest' }, 
+                                        tab === 'brand' ? 'Brand Identity' : tab === 'campaign' ? 'Strategie Setup' : 'Prompt Engine'
+                                    )
+                                )
+                            )
+                        ),
 
-                            <nav className="flex flex-col space-y-3">
-                                <NavItem id="brand" icon={ShieldCheck} label="Brand Identity" />
-                                <NavItem id="campaign" icon={Target} label="Strategie Setup" />
-                                <NavItem id="generator" icon={PenTool} label="Prompt Engine" />
-                            </nav>
+                        React.createElement('div', { className: 'bg-[#103030] rounded-[2rem] p-7 text-white shadow-2xl mt-auto relative overflow-hidden' },
+                            React.createElement('div', { className: 'relative z-10' },
+                                React.createElement('p', { className: 'text-lg font-black uppercase leading-tight mb-2' }, currentBrand.brand_name),
+                                React.createElement('p', { className: 'text-[11px] text-slate-400 font-medium italic' }, `"${currentBrand.offer}"`)
+                            )
+                        )
+                    ),
 
-                            <div className="bg-[#103030] rounded-[2rem] p-7 text-white shadow-2xl mt-auto relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                                    <Award size={80} />
-                                </div>
-                                <div className="relative z-10">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-2 h-2 rounded-full bg-[#F8D800] animate-pulse"></div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F8D800]">Aktiv</span>
-                                    </div>
-                                    <p className="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name || 'Leer'}</p>
-                                    <p className="text-[11px] text-slate-400 font-medium line-clamp-2 italic">"{currentBrand.offer}"</p>
-                                </div>
-                            </div>
-                        </aside>
+                    // Main Content
+                    React.createElement('main', { className: 'bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden flex flex-col min-h-[800px]' },
+                        React.createElement('div', { className: 'p-10 md:p-14 flex-grow' },
+                            
+                            activeTab === 'brand' && React.createElement('div', { className: 'space-y-8 animate-in' },
+                                React.createElement('h2', { className: 'text-4xl font-black text-[#103030] uppercase' }, '01. Brand Setup'),
+                                React.createElement('input', {
+                                    type: 'text',
+                                    value: currentBrand.brand_name,
+                                    onChange: (e) => setCurrentBrand({...currentBrand, brand_name: e.target.value}),
+                                    placeholder: 'Markenname',
+                                    className: 'w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030]'
+                                }),
+                                React.createElement('textarea', {
+                                    value: currentBrand.offer,
+                                    onChange: (e) => setCurrentBrand({...currentBrand, offer: e.target.value}),
+                                    placeholder: 'Core Angebot',
+                                    className: 'w-full h-32 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030]'
+                                })
+                            ),
 
-                        {/* Main Content Area */}
-                        <main className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden flex flex-col min-h-[800px]">
-                            <div className="p-10 md:p-14 flex-grow">
-                                
-                                {activeTab === 'brand' && (
-                                    <div className="space-y-12 animate-in">
-                                        <div>
-                                            <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
-                                            <p className="text-slate-400 font-medium mt-1">Konfiguriere das Fundament deiner Marke.</p>
-                                        </div>
+                            activeTab === 'campaign' && React.createElement('div', { className: 'space-y-8 animate-in' },
+                                React.createElement('h2', { className: 'text-4xl font-black text-[#103030] uppercase' }, '02. Strategie'),
+                                React.createElement('input', {
+                                    type: 'text',
+                                    value: campaign.content_pillar,
+                                    onChange: (e) => setCampaign({...campaign, content_pillar: e.target.value}),
+                                    placeholder: 'Content Pillar',
+                                    className: 'w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030]'
+                                })
+                            ),
 
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                            <div className="space-y-8">
-                                                <InputField 
-                                                    label="Markenname" 
-                                                    icon={Briefcase}
-                                                    value={currentBrand.brand_name} 
-                                                    onChange={(val) => setCurrentBrand({...currentBrand, brand_name: val})} 
-                                                />
-                                                <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                                                        <Megaphone size={12} className="opacity-40" /> Core-Angebot
-                                                    </label>
-                                                    <textarea 
-                                                        value={currentBrand.offer}
-                                                        onChange={(e) => setCurrentBrand({...currentBrand, offer: e.target.value})}
-                                                        className="w-full h-32 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-8">
-                                                <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
-                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#103030]">Key-Differenzierung</h3>
-                                                    <InputField label="USP 01" value={currentBrand.usp_1} onChange={(val) => setCurrentBrand({...currentBrand, usp_1: val})} />
-                                                    <InputField label="USP 02" value={currentBrand.usp_2} onChange={(val) => setCurrentBrand({...currentBrand, usp_2: val})} />
-                                                </div>
-                                                <TagInput 
-                                                    label="No-Go Wörter" 
-                                                    icon={Trash2}
-                                                    tags={currentBrand.no_go_words}
-                                                    onAdd={(tag) => setCurrentBrand({...currentBrand, no_go_words: [...currentBrand.no_go_words, tag]})}
-                                                    onRemove={(tag) => setCurrentBrand({...currentBrand, no_go_words: currentBrand.no_go_words.filter(t => t !== tag)})}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'campaign' && (
-                                    <div className="space-y-12 animate-in">
-                                        <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie</h2>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="bg-white p-10 rounded-[3rem] border-2 border-slate-100 shadow-sm space-y-8">
-                                                <h3 className="text-[#103030] font-black uppercase text-xs tracking-[0.2em]">Funnel Logik</h3>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {['awareness', 'consideration', 'conversion'].map(stage => (
-                                                        <button
-                                                            key={stage}
-                                                            onClick={() => setCampaign({...campaign, funnel_stage: stage})}
-                                                            className={`py-4 px-6 text-xs font-black uppercase tracking-widest rounded-2xl border-2 transition-all ${
-                                                                campaign.funnel_stage === stage 
-                                                                ? 'bg-[#103030] border-[#103030] text-[#F8D800]' 
-                                                                : 'bg-slate-50 border-slate-50 text-slate-400'
-                                                            }`}
-                                                        >
-                                                            {stage}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="space-y-8">
-                                                <InputField label="Content Pillar" value={campaign.content_pillar} onChange={(val) => setCampaign({...campaign, content_pillar: val})} />
-                                                <InputField label="Kampagnen Ziel" value={campaign.objective} onChange={(val) => setCampaign({...campaign, objective: val})} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'generator' && (
-                                    <div className="h-full flex flex-col items-center justify-center text-center py-10 animate-in">
-                                        <div className="w-28 h-28 bg-[#103030] rounded-full flex items-center justify-center mb-8 shadow-2xl relative">
-                                            <Zap size={48} className="text-[#F8D800]" />
-                                        </div>
-                                        <h2 className="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Master Prompt</h2>
-                                        <p className="text-slate-400 max-w-lg mb-12 font-medium">Bereit zum Kopieren in ChatGPT oder Claude.</p>
-                                        
-                                        <button 
-                                           onClick={handleGeneratePrompt}
-                                           className="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4"
-                                        >
-                                            {copied ? <CheckCircle size={28} /> : <Zap size={28} />}
-                                            <span>{copied ? "Prompt Kopiert!" : "Prompt Generieren"}</span>
-                                        </button>
-
-                                        {generatedPrompt && (
-                                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-2xl text-left font-mono text-xs text-slate-500 whitespace-pre-wrap max-h-40 overflow-y-auto">
-                                                {generatedPrompt}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </main>
-                    </div>
-                </div>
+                            activeTab === 'generator' && React.createElement('div', { className: 'h-full flex flex-col items-center justify-center text-center py-10 animate-in' },
+                                React.createElement('div', { className: 'w-28 h-28 bg-[#103030] rounded-full flex items-center justify-center mb-8 shadow-2xl' },
+                                    React.createElement(Zap, { size: 48 })
+                                ),
+                                React.createElement('h2', { className: 'text-5xl font-black text-[#103030] uppercase mb-4' }, 'Master Prompt'),
+                                React.createElement('button', {
+                                    onClick: handleGeneratePrompt,
+                                    className: 'bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase shadow-2xl transition-all hover:scale-105'
+                                }, copied ? 'Prompt Kopiert!' : 'Prompt Generieren'),
+                                generatedPrompt && React.createElement('div', { 
+                                    className: 'mt-10 p-6 bg-slate-50 rounded-2xl border w-full max-w-2xl text-left font-mono text-xs text-slate-500 whitespace-pre-wrap max-h-40 overflow-y-auto'
+                                }, generatedPrompt)
+                            )
+                        )
+                    )
+                )
             );
-        };
+        }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // Mount App
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(React.createElement(App));
     </script>
 </body>
 </html>
