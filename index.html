@@ -19,17 +19,17 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .animate-in {
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeIn 0.4s ease-out forwards;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .custom-scroll::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
         .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #f8fafc;
         }
         .custom-scroll::-webkit-scrollbar-thumb {
             background: #103030;
@@ -41,11 +41,8 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, memo } = React;
+        const { useState, useEffect, useRef, memo, useCallback } = React;
         
-        /**
-         * Icon Wrapper für maximale Kompatibilität
-         */
         const Icon = ({ name, size = 20, className = "" }) => {
             const iconRef = useRef(null);
             useEffect(() => {
@@ -68,8 +65,6 @@
             return <span ref={iconRef} className="inline-flex items-center justify-center"></span>;
         };
 
-        // --- Stabile Input Komponenten um Cursor-Sprünge zu vermeiden ---
-        
         const InputField = memo(({ label, value, onChange, placeholder, icon }) => (
             <div className="space-y-2">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
@@ -77,7 +72,7 @@
                 </label>
                 <input
                     type="text"
-                    value={value}
+                    value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
@@ -86,14 +81,12 @@
         ));
 
         const MultiSelectChannels = memo(({ selectedChannels, onChange }) => {
-            const channels = ["Instagram", "TikTok", "LinkedIn", "YouTube", "Facebook", "Twitter/X"];
-            
+            const channels = ["Instagram", "TikTok", "LinkedIn", "YouTube", "Facebook", "X"];
             const toggleChannel = (channel) => {
-                if (selectedChannels.includes(channel)) {
-                    onChange(selectedChannels.filter(c => c !== channel));
-                } else {
-                    onChange([...selectedChannels, channel]);
-                }
+                const updated = selectedChannels.includes(channel)
+                    ? selectedChannels.filter(c => c !== channel)
+                    : [...selectedChannels, channel];
+                onChange(updated);
             };
 
             return (
@@ -106,9 +99,9 @@
                             <button
                                 key={channel}
                                 onClick={() => toggleChannel(channel)}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${
+                                className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-tight transition-all border-2 ${
                                     selectedChannels.includes(channel)
-                                    ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-md'
+                                    ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-md scale-105'
                                     : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
                                 }`}
                             >
@@ -120,8 +113,14 @@
             );
         });
 
-        const TagInput = memo(({ label, tags, onAdd, onRemove, icon, colorClass = "bg-slate-100" }) => {
+        const TagInput = memo(({ label, tags, onAdd, onRemove, icon, colorClass = "bg-slate-100", placeholder = "Hinzufügen..." }) => {
             const [val, setVal] = useState('');
+            const handleAdd = () => {
+                if (val.trim()) {
+                    onAdd(val.trim());
+                    setVal('');
+                }
+            };
             return (
                 <div className="space-y-3">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
@@ -132,25 +131,28 @@
                             type="text"
                             value={val}
                             onChange={(e) => setVal(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter' && val) { onAdd(val); setVal(''); }}}
-                            className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030]"
-                            placeholder="Hinzufügen..."
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd(); }}}
+                            className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030] shadow-sm"
+                            placeholder={placeholder}
                         />
                         <button 
-                            onClick={() => { if(val) { onAdd(val); setVal(''); }}}
-                            className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg"
+                            onClick={handleAdd}
+                            className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg active:scale-95"
                         >
                             <Icon name="Plus" size={24} />
                         </button>
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-2">
+                    <div className="flex flex-wrap gap-2 pt-1">
                         {tags.map((tag, i) => (
-                            <span key={tag + i} className={`flex items-center gap-2 ${colorClass} text-[#103030] border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider`}>
+                            <div key={`${tag}-${i}`} className={`flex items-center gap-2 ${colorClass} text-[#103030] border border-slate-200/50 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm animate-in`}>
                                 {tag}
-                                <button onClick={() => onRemove(tag)} className="hover:text-red-500 transition-colors">
+                                <button 
+                                    onClick={() => onRemove(tag)} 
+                                    className="hover:text-red-600 transition-colors p-0.5 rounded-full hover:bg-white/50"
+                                >
                                     <Icon name="X" size={12} />
                                 </button>
-                            </span>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -158,30 +160,25 @@
         });
 
         const App = () => {
-            // --- Konfiguration & Konstanten ---
             const ANTI_GENERIC_RULES = [
                 "Keine leeren Claims (z.B. „innovativ“, „revolutionär“).",
                 "Keine Floskeln wie „Entdecke“ oder „In diesem Beitrag“.",
-                "Konkrete Beispiele und Zahlen einbauen (statt 'viele' schreib '126').",
-                "Kurze Sätze. Aktiv statt Passiv. Direkte Ansprache.",
-                "Brand Voice konsequent einhalten: Weniger Marketing-Bla, mehr Experten-Expertise.",
+                "Konkrete Beispiele und Zahlen einbauen.",
+                "Kurze Sätze. Aktiv statt Passiv.",
+                "Brand Voice konsequent einhalten.",
                 "No-Go-Wörter strikt vermeiden.",
-                "Keine Emojis, außer ausdrücklich gewünscht.",
-                "Verwende das 'Problem-Agitation-Solution' Framework für Captions."
+                "Keine Emojis."
             ];
 
-            // --- State Management ---
             const [activeTab, setActiveTab] = useState('brand');
-            const [currentBrand, setCurrentBrand] = useState({
+            const [brand, setBrand] = useState({
                 brand_name: 'Stitch & Line',
                 offer: 'Individuelle T‑Shirt-Designs für Creator in 72 Stunden.',
                 audience: 'Creator und kleine E‑Com Brands (1–5 Personen).',
                 channels: ['Instagram', 'TikTok'],
-                usp_1: '72h Delivery: Druckdateien + Mockups',
-                usp_2: 'Stil-Check: Designs passen zum Brand-Style',
-                usp_3: 'Merch-Conversion Fokus',
-                brand_voice_adjectives: ['klar', 'direkt', 'kreativ'],
-                no_go_words: ['revolutionär', 'bahnbrechend', 'entdecken'],
+                usps: ['72h Delivery inkl. Mockups', 'Echter Stil-Check'],
+                brand_voice: ['klar', 'direkt', 'kreativ'],
+                no_gos: ['revolutionär', 'bahnbrechend', 'entdecken'],
                 cta: 'Schreib „MERCH“ per DM.',
                 competitors: ['Fiverr Designer', 'Canva Templates']
             });
@@ -194,44 +191,41 @@
                 audience_segment: 'Creator ohne Design-Skills'
             });
 
-            const [generatedPrompt, setGeneratedPrompt] = useState('');
             const [copied, setCopied] = useState(false);
 
-            // --- Handlers ---
-            const updateBrand = (key, value) => setCurrentBrand(prev => ({ ...prev, [key]: value }));
-            const updateCampaign = (key, value) => setCampaign(prev => ({ ...prev, [key]: value }));
+            const updateBrand = useCallback((key, value) => {
+                setBrand(prev => ({ ...prev, [key]: value }));
+            }, []);
 
-            const handleGeneratePrompt = () => {
-                const prompt = `
-ROLLE: Senior Content-Stratege & psychologischer Copywriter.
+            const updateCampaign = useCallback((key, value) => {
+                setCampaign(prev => ({ ...prev, [key]: value }));
+            }, []);
+
+            const fullPrompt = `
+ROLLE: Senior Content-Stratege & Copywriter.
 KONTEXT:
-- MARKE: ${currentBrand.brand_name}
-- ANGEBOT: ${currentBrand.offer}
-- ZIELGRUPPE: ${currentBrand.audience} (Segment: ${campaign.audience_segment})
-- KANÄLE: ${currentBrand.channels.join(', ')}
-- WETTBEWERBER: ${currentBrand.competitors.join(', ')}
+- MARKE: ${brand.brand_name}
+- ANGEBOT: ${brand.offer}
+- ZIELGRUPPE: ${brand.audience}
+- KANÄLE: ${brand.channels.join(', ')}
+- WETTBEWERBER: ${brand.competitors.join(', ')}
 
 STRATEGIE:
 - PHASE: ${campaign.funnel_stage.toUpperCase()}
-- THEMA: ${campaign.content_pillar}
-- TON: ${currentBrand.brand_voice_adjectives.join(', ')} (Vibe: ${campaign.tone})
+- TON: ${brand.brand_voice.join(', ')}
 
 USPs:
-1. ${currentBrand.usp_1}
-2. ${currentBrand.usp_2}
-3. ${currentBrand.usp_3}
-
-AUFGABE: Erstelle Content für ${currentBrand.channels.join(' & ')}. Nutze für Videos [HOOK -> AGITATION -> PROOF -> CTA].
+${brand.usps.map((u, i) => `${i+1}. ${u}`).join('\n')}
 
 ANTI-GENERIC REGELN:
 ${ANTI_GENERIC_RULES.join('\n')}
-VERBOTENE WÖRTER: ${currentBrand.no_go_words.join(', ')}
-CTA: ${currentBrand.cta}
-                `.trim();
+NO-GOs: ${brand.no_gos.join(', ')}
+CTA: ${brand.cta}
+            `.trim();
 
-                setGeneratedPrompt(prompt);
+            const copyToClipboard = () => {
                 const textArea = document.createElement("textarea");
-                textArea.value = prompt;
+                textArea.value = fullPrompt;
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand('copy');
@@ -241,11 +235,11 @@ CTA: ${currentBrand.cta}
             };
 
             return (
-                <div className="min-h-screen p-4 md:p-10">
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10">
+                <div className="min-h-screen p-4 md:p-10 flex justify-center">
+                    <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
                         
                         {/* Sidebar */}
-                        <aside className="space-y-10 flex flex-col">
+                        <aside className="space-y-6 flex flex-col">
                             <div className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center">
                                 <h1 className="text-2xl font-[900] tracking-tighter text-[#103030] uppercase leading-none">
                                     SMART<span className="text-[#F8D800]">HIRN</span>
@@ -253,70 +247,71 @@ CTA: ${currentBrand.cta}
                                 <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2">Strategy master v0.1</p>
                             </div>
 
-                            <nav className="flex flex-col space-y-3">
-                                <button onClick={() => setActiveTab('brand')} className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === 'brand' ? 'bg-[#103030] text-[#F8D800] shadow-xl' : 'text-slate-400 hover:bg-slate-100'}`}>
-                                    <Icon name="ShieldCheck" size={20} />
-                                    <span className="font-black uppercase text-[11px] tracking-widest">Brand Identity</span>
-                                </button>
-                                <button onClick={() => setActiveTab('campaign')} className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === 'campaign' ? 'bg-[#103030] text-[#F8D800] shadow-xl' : 'text-slate-400 hover:bg-slate-100'}`}>
-                                    <Icon name="Target" size={20} />
-                                    <span className="font-black uppercase text-[11px] tracking-widest">Strategie Setup</span>
-                                </button>
-                                <button onClick={() => setActiveTab('generator')} className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === 'generator' ? 'bg-[#103030] text-[#F8D800] shadow-xl' : 'text-slate-400 hover:bg-slate-100'}`}>
-                                    <Icon name="PenTool" size={20} />
-                                    <span className="font-black uppercase text-[11px] tracking-widest">Prompt Engine</span>
-                                </button>
+                            <nav className="flex flex-col space-y-2">
+                                {[
+                                    ['brand', 'ShieldCheck', 'Brand Identity'],
+                                    ['campaign', 'Target', 'Strategie Setup'],
+                                    ['generator', 'Zap', 'Prompt Engine']
+                                ].map(([id, icon, label]) => (
+                                    <button 
+                                        key={id} 
+                                        onClick={() => setActiveTab(id)} 
+                                        className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === id ? 'bg-[#103030] text-[#F8D800] shadow-xl translate-x-1' : 'text-slate-400 hover:bg-white hover:text-slate-600'}`}
+                                    >
+                                        <Icon name={icon} size={20} />
+                                        <span className="font-black uppercase text-[10px] tracking-widest">{label}</span>
+                                    </button>
+                                ))}
                             </nav>
 
-                            <div className="bg-[#103030] rounded-[2rem] p-7 text-white shadow-2xl mt-auto overflow-hidden">
-                                <p className="text-lg font-black uppercase leading-tight mb-2 truncate">{currentBrand.brand_name}</p>
-                                <p className="text-[11px] text-slate-400 italic line-clamp-2">"{currentBrand.offer}"</p>
+                            <div className="bg-[#103030] rounded-[2rem] p-6 text-white shadow-2xl mt-auto relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+                                <p className="text-sm font-black uppercase leading-tight mb-1 truncate relative z-10">{brand.brand_name || 'Deine Brand'}</p>
+                                <p className="text-[10px] text-slate-400 italic line-clamp-1 relative z-10">{brand.offer}</p>
                             </div>
                         </aside>
 
-                        {/* Main Content Area */}
-                        <main className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-hidden min-h-[850px]">
-                            <div className="p-10 md:p-14">
+                        {/* Content Area */}
+                        <main className="bg-white border border-slate-200 rounded-[3rem] shadow-xl overflow-hidden min-h-[800px] flex flex-col">
+                            <div className="p-8 md:p-12 flex-1 overflow-y-auto custom-scroll">
                                 
                                 {activeTab === 'brand' && (
-                                    <div className="space-y-12 animate-in">
+                                    <div className="space-y-10 animate-in">
                                         <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                             <div className="space-y-8">
-                                                <InputField label="Markenname" icon="Briefcase" value={currentBrand.brand_name} onChange={(v) => updateBrand('brand_name', v)} />
-                                                <InputField label="Zielgruppe" icon="Users" value={currentBrand.audience} onChange={(v) => updateBrand('audience', v)} />
+                                                <InputField label="Markenname" icon="Briefcase" value={brand.brand_name} onChange={(v) => updateBrand('brand_name', v)} />
+                                                <InputField label="Zielgruppe" icon="Users" value={brand.audience} onChange={(v) => updateBrand('audience', v)} />
                                                 <div className="space-y-2">
                                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Angebot</label>
                                                     <textarea 
-                                                        value={currentBrand.offer}
+                                                        value={brand.offer}
                                                         onChange={(e) => updateBrand('offer', e.target.value)}
-                                                        className="w-full h-24 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 focus:outline-none focus:border-[#103030]"
+                                                        className="w-full h-24 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
                                                     />
                                                 </div>
-                                                <InputField label="USP 1" value={currentBrand.usp_1} onChange={(v) => updateBrand('usp_1', v)} />
-                                                <InputField label="USP 2" value={currentBrand.usp_2} onChange={(v) => updateBrand('usp_2', v)} />
-                                                <InputField label="USP 3" value={currentBrand.usp_3} onChange={(v) => updateBrand('usp_3', v)} />
+                                                <TagInput label="Wettbewerber" icon="Target" tags={brand.competitors} onAdd={(t) => updateBrand('competitors', [...brand.competitors, t])} onRemove={(t) => updateBrand('competitors', brand.competitors.filter(x => x !== t))} />
                                             </div>
                                             <div className="space-y-8">
-                                                <MultiSelectChannels selectedChannels={currentBrand.channels} onChange={(v) => updateBrand('channels', v)} />
-                                                <TagInput label="Wettbewerber" icon="Target" tags={currentBrand.competitors} onAdd={(t) => updateBrand('competitors', [...currentBrand.competitors, t])} onRemove={(t) => updateBrand('competitors', currentBrand.competitors.filter(x => x !== t))} />
-                                                <TagInput label="Brand Voice" icon="Mic" tags={currentBrand.brand_voice_adjectives} colorClass="bg-[#F8D800]/20" onAdd={(t) => updateBrand('brand_voice_adjectives', [...currentBrand.brand_voice_adjectives, t])} onRemove={(t) => updateBrand('brand_voice_adjectives', currentBrand.brand_voice_adjectives.filter(x => x !== t))} />
-                                                <TagInput label="No-Go Wörter" icon="Trash2" tags={currentBrand.no_go_words} colorClass="bg-red-50" onAdd={(t) => updateBrand('no_go_words', [...currentBrand.no_go_words, t])} onRemove={(t) => updateBrand('no_go_words', currentBrand.no_go_words.filter(x => x !== t))} />
-                                                <InputField label="CTA" value={currentBrand.cta} onChange={(v) => updateBrand('cta', v)} />
+                                                <MultiSelectChannels selectedChannels={brand.channels} onChange={(v) => updateBrand('channels', v)} />
+                                                <TagInput label="USPs (Alleinstellungsmerkmale)" icon="Star" tags={brand.usps} colorClass="bg-blue-50" onAdd={(t) => updateBrand('usps', [...brand.usps, t])} onRemove={(t) => updateBrand('usps', brand.usps.filter(x => x !== t))} />
+                                                <TagInput label="Brand Voice" icon="Mic" tags={brand.brand_voice} colorClass="bg-[#F8D800]/20" onAdd={(t) => updateBrand('brand_voice', [...brand.brand_voice, t])} onRemove={(t) => updateBrand('brand_voice', brand.brand_voice.filter(x => x !== t))} />
+                                                <TagInput label="No-Go Wörter" icon="Trash2" tags={brand.no_gos} colorClass="bg-red-50" onAdd={(t) => updateBrand('no_gos', [...brand.no_gos, t])} onRemove={(t) => updateBrand('no_gos', brand.no_gos.filter(x => x !== t))} />
+                                                <InputField label="CTA (Call to Action)" value={brand.cta} onChange={(v) => updateBrand('cta', v)} />
                                             </div>
                                         </div>
                                     </div>
                                 )}
 
                                 {activeTab === 'campaign' && (
-                                    <div className="space-y-12 animate-in">
+                                    <div className="space-y-10 animate-in">
                                         <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie Setup</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="bg-slate-50 p-10 rounded-[3rem] border border-slate-200 space-y-8">
-                                                <h3 className="text-[#103030] font-black uppercase text-xs tracking-[0.2em]">Funnel Stage</h3>
+                                            <div className="bg-slate-50 p-10 rounded-[3rem] border border-slate-200/60 space-y-8">
+                                                <h3 className="text-[#103030] font-black uppercase text-[10px] tracking-[0.2em] opacity-60">Funnel Stage</h3>
                                                 <div className="grid grid-cols-1 gap-3">
                                                     {['awareness', 'consideration', 'conversion'].map(stage => (
-                                                        <button key={stage} onClick={() => updateCampaign('funnel_stage', stage)} className={`py-4 px-6 text-xs font-black uppercase tracking-widest rounded-2xl border-2 transition-all ${campaign.funnel_stage === stage ? 'bg-[#103030] border-[#103030] text-[#F8D800]' : 'bg-white border-slate-200 text-slate-400'}`}>
+                                                        <button key={stage} onClick={() => updateCampaign('funnel_stage', stage)} className={`py-5 px-6 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border-2 transition-all ${campaign.funnel_stage === stage ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-lg' : 'bg-white border-slate-200 text-slate-400'}`}>
                                                             {stage}
                                                         </button>
                                                     ))}
@@ -327,8 +322,8 @@ CTA: ${currentBrand.cta}
                                                 <InputField label="Segment" value={campaign.audience_segment} onChange={(v) => updateCampaign('audience_segment', v)} />
                                                 <InputField label="Inhaltstyp" value={campaign.content_pillar} onChange={(v) => updateCampaign('content_pillar', v)} />
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Vibe</label>
-                                                    <select value={campaign.tone} onChange={(e) => updateCampaign('tone', e.target.value)} className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-bold uppercase text-xs focus:outline-none focus:border-[#103030]">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Tonalität</label>
+                                                    <select value={campaign.tone} onChange={(e) => updateCampaign('tone', e.target.value)} className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-bold uppercase text-[11px] tracking-widest focus:outline-none focus:border-[#103030] shadow-sm appearance-none cursor-pointer">
                                                         <option value="bold">Bold</option>
                                                         <option value="empathic">Empathisch</option>
                                                         <option value="authoritative">Kompetent</option>
@@ -340,20 +335,39 @@ CTA: ${currentBrand.cta}
                                 )}
 
                                 {activeTab === 'generator' && (
-                                    <div className="h-full flex flex-col items-center justify-center text-center py-10 animate-in">
-                                        <div className="w-24 h-24 bg-[#103030] rounded-full flex items-center justify-center mb-8 shadow-2xl">
-                                            <Icon name="Zap" size={40} className="text-[#F8D800] fill-[#F8D800]" />
-                                        </div>
-                                        <h2 className="text-5xl font-black text-[#103030] uppercase tracking-tighter mb-4">Prompt Engine</h2>
-                                        <button onClick={handleGeneratePrompt} className="group relative bg-[#103030] text-[#F8D800] px-12 py-6 rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-4">
-                                            <Icon name={copied ? "CheckCircle" : "Zap"} size={28} />
-                                            <span>{copied ? "Kopiert!" : "Erstellen"}</span>
-                                        </button>
-                                        {generatedPrompt && (
-                                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200 w-full max-w-3xl text-left font-mono text-[10px] text-slate-500 whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scroll shadow-inner">
-                                                {generatedPrompt}
+                                    <div className="h-full space-y-8 animate-in flex flex-col items-center">
+                                        <div className="text-center space-y-4 max-w-xl">
+                                            <div className="w-20 h-20 bg-[#103030] rounded-full flex items-center justify-center mx-auto shadow-2xl mb-4">
+                                                <Icon name="Zap" size={32} className="text-[#F8D800] fill-[#F8D800]" />
                                             </div>
-                                        )}
+                                            <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">Prompt Engine</h2>
+                                            <p className="text-slate-400 text-sm font-medium italic">Dein maßgeschneiderter Master-Prompt ist bereit.</p>
+                                        </div>
+
+                                        <div className="w-full max-w-3xl relative group">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-[#103030] to-slate-800 rounded-[2.5rem] transform rotate-1 opacity-5 group-hover:rotate-0 transition-transform"></div>
+                                            <div className="relative bg-white border-2 border-slate-100 rounded-[2.5rem] shadow-2xl overflow-hidden">
+                                                <div className="bg-slate-50 border-b border-slate-100 px-8 py-4 flex justify-between items-center">
+                                                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Master Prompt v1.0</span>
+                                                    <button 
+                                                        onClick={copyToClipboard}
+                                                        className={`flex items-center gap-2 px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest transition-all ${copied ? 'bg-green-500 text-white' : 'bg-[#F8D800] text-[#103030] hover:scale-105 shadow-md active:scale-95'}`}
+                                                    >
+                                                        <Icon name={copied ? "Check" : "Copy"} size={14} />
+                                                        {copied ? "Kopiert!" : "Prompt Kopieren"}
+                                                    </button>
+                                                </div>
+                                                <div className="p-8 max-h-[400px] overflow-y-auto custom-scroll font-mono text-[11px] leading-relaxed text-slate-600 whitespace-pre-wrap">
+                                                    {fullPrompt}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex gap-4 items-center text-[10px] font-bold text-slate-300 uppercase tracking-widest pt-4">
+                                            <span className="flex items-center gap-1"><Icon name="Lock" size={12} /> Privacy First</span>
+                                            <span>•</span>
+                                            <span className="flex items-center gap-1"><Icon name="Cpu" size={12} /> Local Storage</span>
+                                        </div>
                                     </div>
                                 )}
                             </div>
