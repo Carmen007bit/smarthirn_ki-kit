@@ -4,381 +4,297 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartHirn Prompt Engine</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .animate-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .custom-scroll::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f8fafc;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #103030;
-            border-radius: 10px;
-        }
+        .animate-in { animation: fadeIn 0.35s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #103030; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-[#F9FAFB]">
-    <div id="root"></div>
+<div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, memo, useCallback } = React;
-        
-        const Icon = ({ name, size = 20, className = "" }) => {
-            const iconRef = useRef(null);
-            useEffect(() => {
-                if (iconRef.current && window.lucide) {
-                    iconRef.current.innerHTML = '';
-                    const iconData = lucide.icons[name];
-                    if (iconData) {
-                        const iconElement = lucide.createIcons({
-                            icons: { [name]: iconData },
-                            attrs: { 
-                                strokeWidth: 2,
-                                width: size,
-                                height: size,
-                                class: className
-                            }
-                        });
-                    }
-                }
-            }, [name, size, className]);
-            return <span ref={iconRef} className="inline-flex items-center justify-center"></span>;
-        };
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, memo } = React;
 
-        const InputField = memo(({ label, value, onChange, placeholder, icon }) => (
-            <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                    {icon && <Icon name={icon} size={12} className="opacity-40" />} {label}
-                </label>
-                <input
-                    type="text"
-                    value={value || ''}
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder={placeholder}
-                    className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-slate-700 font-medium focus:outline-none focus:border-[#103030] transition-all shadow-sm"
-                />
-            </div>
-        ));
+const PROMPT_TEMPLATES = [
+  { id:'p1', category:'Ideen', title:'Themen-Brainstorming', prompt:`Rolle: Content-Stratege\nKontext:\n- Nische: {{niche}}\n- Zielgruppe: {{audience}}\n- Säulen: {{pillars}}\nAufgabe: Erstelle 20 konkrete Ideen sortiert nach Säule.`},
+  { id:'p2', category:'Ideen', title:'Content-Serien-Generator', prompt:`Rolle: Content-Stratege\nKontext: Thema {{topic}}, Zielgruppe {{audience}}\nAufgabe: Erstelle eine 5-Post-Serie mit Titel + 3 Kernpunkten pro Post.`},
+  { id:'p3', category:'Ideen', title:'12-Wochen-Plan', prompt:`Rolle: Strategischer Editor\nErstelle einen 12-Wochen-Plan mit 3 Posts/Woche inkl. Format, Hook-Idee und CTA.`},
+  { id:'p4', category:'Ideen', title:'Winkel-Generator', prompt:`Gib mir 15 neue Perspektiven auf {{topic}}: Mythos, Fehler, Story, How-to, Vergleich.`},
+  { id:'p5', category:'Ideen', title:'Problemliste der Zielgruppe', prompt:`Liste 25 konkrete Probleme von {{audience}} mit jeweiligem Content-Ansatz.`},
+  { id:'p6', category:'Hook', title:'Generic Hook -> Spezifisch', prompt:`Mein Hook: "{{hook}}"\nZielgruppe: {{audience}}\nErstelle 5 Hooks <= 15 Wörter mit Kontrast und Spezifität.`},
+  { id:'p7', category:'Hook', title:'Hook-Varianten by Tone', prompt:`Erstelle 9 Hook-Varianten (bold, empathisch, kompetent) für Thema {{topic}}.`},
+  { id:'p8', category:'Hook', title:'Curiosity-Gap-Builder', prompt:`Baue 5 Curiosity-Hooks für {{topic}}. Keine Klickbait-Floskeln, nur konkrete Spannung.`},
+  { id:'p9', category:'Hook', title:'Scroll-Stopper 2-Zeiler', prompt:`Schreibe 10 Scroll-Stopper (2 Zeilen) für {{audience}} zu {{topic}}.`},
+  { id:'p10', category:'Hook', title:'Kontrast-Hooks', prompt:`Formuliere 8 "X ist nicht das Problem, Y ist das Problem" Hooks für {{topic}}.`},
+  { id:'p11', category:'Optimierung', title:'Kürzen ohne Wertverlust', prompt:`Kürze den Text auf 150 Wörter. Behalte Hook, Beispiel und CTA. Begründe Kürzungen.`},
+  { id:'p12', category:'Optimierung', title:'Stimme nach Brand Voice', prompt:`Passe den Text an diese Brand Voice an: {{voice}}. Entferne Buzzwords, erhöhe Klarheit.`},
+  { id:'p13', category:'Optimierung', title:'CTA-Verbesserung', prompt:`Aktueller CTA: {{cta}}\nZiel: {{goal}}\nGib 5 spezifische CTA-Alternativen mit geringer Antwort-Hürde.`},
+  { id:'p14', category:'Optimierung', title:'Anti-Generic Audit', prompt:`Prüfe den Text auf Floskeln, Vagheit, fehlende Beispiele. Gib eine konkrete Revision.`},
+  { id:'p15', category:'Optimierung', title:'Plattform-Adaption', prompt:`Adaptiere den Post für LinkedIn, Instagram, TikTok. Jeweils Hook + Body + CTA.`}
+];
 
-        const MultiSelectChannels = memo(({ selectedChannels, onChange }) => {
-            const channels = ["Instagram", "TikTok", "LinkedIn", "YouTube", "Facebook", "X"];
-            const toggleChannel = (channel) => {
-                const updated = selectedChannels.includes(channel)
-                    ? selectedChannels.filter(c => c !== channel)
-                    : [...selectedChannels, channel];
-                onChange(updated);
-            };
+const CONTENT_SERIES = [
+  'Behind the Scenes (3-5 Posts)', 'Häufige Fehler (5-7 Posts)', 'Tool-Vorstellung (4 Posts)',
+  'Kunden-Transformation (3 Posts)', 'Mythos vs Realität (5 Posts)', 'Wochenroutine (4 Posts)'
+];
 
-            return (
-                <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                        <Icon name="Share2" size={12} className="opacity-40" /> Kanäle
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                        {channels.map(channel => (
-                            <button
-                                key={channel}
-                                onClick={() => toggleChannel(channel)}
-                                className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-tight transition-all border-2 ${
-                                    selectedChannels.includes(channel)
-                                    ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-md scale-105'
-                                    : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
-                                }`}
-                            >
-                                {channel}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            );
-        });
+const CAPTION_TEMPLATES = [
+  'Reverse Psychology Hook', 'Personal Story -> Lesson', 'Controversial Take', 'Myth-Busting', 'Before/After',
+  'Question-First', 'Common Mistake', 'Mini-Tutorial'
+];
 
-        const TagInput = memo(({ label, tags, onAdd, onRemove, icon, colorClass = "bg-slate-100", placeholder = "Hinzufügen..." }) => {
-            const [val, setVal] = useState('');
-            const handleAdd = () => {
-                if (val.trim()) {
-                    onAdd(val.trim());
-                    setVal('');
-                }
-            };
-            return (
-                <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">
-                        {icon && <Icon name={icon} size={12} className="opacity-40" />} {label}
-                    </label>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={val}
-                            onChange={(e) => setVal(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd(); }}}
-                            className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-5 py-3 text-slate-700 focus:outline-none focus:border-[#103030] shadow-sm"
-                            placeholder={placeholder}
-                        />
-                        <button 
-                            onClick={handleAdd}
-                            className="p-3 bg-[#103030] hover:bg-[#1a4a4a] text-[#F8D800] rounded-2xl transition-all shadow-lg active:scale-95"
-                        >
-                            <Icon name="Plus" size={24} />
-                        </button>
-                    </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                        {tags.map((tag, i) => (
-                            <div key={`${tag}-${i}`} className={`flex items-center gap-2 ${colorClass} text-[#103030] border border-slate-200/50 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm animate-in`}>
-                                {tag}
-                                <button 
-                                    onClick={() => onRemove(tag)} 
-                                    className="hover:text-red-600 transition-colors p-0.5 rounded-full hover:bg-white/50"
-                                >
-                                    <Icon name="X" size={12} />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        });
+const FREEBIES = ['Checkliste', 'Mini-Guide (5-7 Seiten)', 'Template/Vorlage'];
 
-        const App = () => {
-            const ANTI_GENERIC_RULES = [
-                "Keine leeren Claims (z.B. „innovativ“, „revolutionär“).",
-                "Keine Floskeln wie „Entdecke“ oder „In diesem Beitrag“.",
-                "Konkrete Beispiele und Zahlen einbauen.",
-                "Kurze Sätze. Aktiv statt Passiv.",
-                "Brand Voice konsequent einhalten.",
-                "No-Go-Wörter strikt vermeiden.",
-                "Keine Emojis."
-            ];
+const Icon = ({ name, size = 18 }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current || !window.lucide) return;
+    ref.current.innerHTML = lucide.icons[name] ? lucide.icons[name].toSvg({ width: size, height: size, strokeWidth: 2 }) : '';
+  }, [name, size]);
+  return <span ref={ref} className="inline-flex" />;
+};
 
-            const [activeTab, setActiveTab] = useState('brand');
-            const [brand, setBrand] = useState({
-                brand_name: 'Stitch & Line',
-                offer: 'Individuelle T‑Shirt-Designs für Creator in 72 Stunden.',
-                audience: 'Creator und kleine E‑Com Brands (1–5 Personen).',
-                channels: ['Instagram', 'TikTok'],
-                usps: ['72h Delivery inkl. Mockups', 'Echter Stil-Check'],
-                brand_voice: ['klar', 'direkt', 'kreativ'],
-                no_gos: ['revolutionär', 'bahnbrechend', 'entdecken'],
-                cta: 'Schreib „MERCH“ per DM.',
-                competitors: ['Fiverr Designer', 'Canva Templates']
-            });
+const InputField = memo(({ label, value, onChange, icon, placeholder }) => (
+  <div className="space-y-2">
+    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 ml-1">{icon && <Icon name={icon} size={12}/>} {label}</label>
+    <input value={value || ''} onChange={(e)=>onChange(e.target.value)} placeholder={placeholder}
+      className="w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-[#103030]"/>
+  </div>
+));
 
-            const [campaign, setCampaign] = useState({
-                objective: 'Mehr qualifizierte Anfragen per DM',
-                funnel_stage: 'conversion',
-                tone: 'bold',
-                content_pillar: 'Social Proof / Case Studies',
-                audience_segment: 'Creator ohne Design-Skills'
-            });
+const TagInput = memo(({ label, tags, onAdd, onRemove }) => {
+  const [val, setVal] = useState('');
+  const add = () => { if (val.trim()) { onAdd(val.trim()); setVal(''); } };
+  return <div className="space-y-3">
+    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">{label}</label>
+    <div className="flex gap-2">
+      <input value={val} onChange={(e)=>setVal(e.target.value)} onKeyDown={(e)=> e.key==='Enter' && (e.preventDefault(), add())}
+        className="flex-1 bg-white border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm" placeholder="Hinzufügen..." />
+      <button onClick={add} className="px-4 bg-[#103030] text-[#F8D800] rounded-2xl"><Icon name="Plus"/></button>
+    </div>
+    <div className="flex flex-wrap gap-2">{tags.map((tag)=><button key={tag} onClick={()=>onRemove(tag)} className="px-3 py-1 rounded-full bg-slate-100 text-xs">{tag} ×</button>)}</div>
+  </div>;
+});
 
-            const [copied, setCopied] = useState(false);
+const App = () => {
+  const defaultBrand = {
+    brand_name:'Stitch & Line', offer:'Individuelle T‑Shirt-Designs für Creator in 72 Stunden.', audience:'Creator und kleine E‑Com Brands',
+    channels:['Instagram','TikTok'], usps:['72h Delivery inkl. Mockups','Echter Stil-Check'], brand_voice:['klar','direkt','kreativ'],
+    no_gos:['revolutionär','bahnbrechend','entdecken'], cta:'Schreib „MERCH“ per DM.', competitors:['Fiverr Designer','Canva Templates']
+  };
+  const defaultCampaign = { objective:'Mehr qualifizierte Anfragen per DM', funnel_stage:'conversion', tone:'bold', content_pillar:'Social Proof / Case Studies', audience_segment:'Creator ohne Design-Skills', niche:'Creator Services'};
 
-            const updateBrand = useCallback((key, value) => {
-                setBrand(prev => ({ ...prev, [key]: value }));
-            }, []);
+  const [activeTab, setActiveTab] = useState('brand');
+  const [toolkitPart, setToolkitPart] = useState('A');
+  const [selectedPromptId, setSelectedPromptId] = useState('p1');
+  const [brand, setBrand] = useState(defaultBrand);
+  const [campaign, setCampaign] = useState(defaultCampaign);
+  const [copied, setCopied] = useState(false);
 
-            const updateCampaign = useCallback((key, value) => {
-                setCampaign(prev => ({ ...prev, [key]: value }));
-            }, []);
+  useEffect(() => {
+    const saved = localStorage.getItem('smarthirn-kit-v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.brand) setBrand(parsed.brand);
+      if (parsed.campaign) setCampaign(parsed.campaign);
+      if (parsed.selectedPromptId) setSelectedPromptId(parsed.selectedPromptId);
+    }
+  }, []);
 
-            const fullPrompt = `
-ROLLE: Senior Content-Stratege & Copywriter.
+  useEffect(() => {
+    localStorage.setItem('smarthirn-kit-v2', JSON.stringify({ brand, campaign, selectedPromptId }));
+  }, [brand, campaign, selectedPromptId]);
+
+  const updateBrand = useCallback((k,v)=>setBrand(p=>({ ...p, [k]: v })), []);
+  const updateCampaign = useCallback((k,v)=>setCampaign(p=>({ ...p, [k]: v })), []);
+
+  const selectedPrompt = PROMPT_TEMPLATES.find(t => t.id === selectedPromptId);
+  const antiGeneric = ['Keine leeren Claims','Keine Floskeln wie „Entdecke“','Konkrete Beispiele & Zahlen','Kurze Sätze, aktiv','Brand Voice einhalten','No-Go-Wörter vermeiden','Keine Emojis'];
+
+  const fullPrompt = `ROLLE: Senior Content-Stratege & Copywriter
 KONTEXT:
-- MARKE: ${brand.brand_name}
-- ANGEBOT: ${brand.offer}
-- ZIELGRUPPE: ${brand.audience}
-- KANÄLE: ${brand.channels.join(', ')}
-- WETTBEWERBER: ${brand.competitors.join(', ')}
+- Marke: ${brand.brand_name}
+- Nische: ${campaign.niche}
+- Angebot: ${brand.offer}
+- Zielgruppe: ${brand.audience}
+- Kanäle: ${brand.channels.join(', ')}
+- Wettbewerber: ${brand.competitors.join(', ')}
 
 STRATEGIE:
-- PHASE: ${campaign.funnel_stage.toUpperCase()}
-- TON: ${brand.brand_voice.join(', ')}
+- Funnel-Phase: ${campaign.funnel_stage.toUpperCase()}
+- Kampagnenziel: ${campaign.objective}
+- Content-Säule: ${campaign.content_pillar}
+- Segment: ${campaign.audience_segment}
+- Tonalität: ${campaign.tone}
 
 USPs:
-${brand.usps.map((u, i) => `${i+1}. ${u}`).join('\n')}
+${brand.usps.map((u,i)=>`${i+1}. ${u}`).join('\n')}
 
-ANTI-GENERIC REGELN:
-${ANTI_GENERIC_RULES.join('\n')}
-NO-GOs: ${brand.no_gos.join(', ')}
-CTA: ${brand.cta}
-            `.trim();
+ANTI-GENERIC:
+${antiGeneric.map((r,i)=>`${i+1}. ${r}`).join('\n')}
+No-Gos: ${brand.no_gos.join(', ')}
+CTA-Ziel: ${brand.cta}
 
-            const copyToClipboard = () => {
-                const textArea = document.createElement("textarea");
-                textArea.value = fullPrompt;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-                document.body.removeChild(textArea);
-            };
+AUSGEWÄHLTER MASTER-PROMPT (${selectedPrompt?.title}):
+${selectedPrompt?.prompt}`;
 
-            return (
-                <div className="min-h-screen p-4 md:p-10 flex justify-center">
-                    <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-                        
-                        {/* Sidebar */}
-                        <aside className="space-y-6 flex flex-col">
-                            <div className="bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm flex flex-col items-center text-center">
-                                <h1 className="text-2xl font-[900] tracking-tighter text-[#103030] uppercase leading-none">
-                                    SMART<span className="text-[#F8D800]">HIRN</span>
-                                </h1>
-                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2">Strategy master v0.1</p>
-                            </div>
+  const copyToClipboard = async () => {
+    try { await navigator.clipboard.writeText(fullPrompt); }
+    catch { const ta = document.createElement('textarea'); ta.value = fullPrompt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+    setCopied(true); setTimeout(()=>setCopied(false), 2000);
+  };
 
-                            <nav className="flex flex-col space-y-2">
-                                {[
-                                    ['brand', 'ShieldCheck', 'Brand Identity'],
-                                    ['campaign', 'Target', 'Strategie Setup'],
-                                    ['generator', 'Zap', 'Prompt Engine']
-                                ].map(([id, icon, label]) => (
-                                    <button 
-                                        key={id} 
-                                        onClick={() => setActiveTab(id)} 
-                                        className={`flex items-center space-x-3 px-6 py-4 rounded-2xl transition-all ${activeTab === id ? 'bg-[#103030] text-[#F8D800] shadow-xl translate-x-1' : 'text-slate-400 hover:bg-white hover:text-slate-600'}`}
-                                    >
-                                        <Icon name={icon} size={20} />
-                                        <span className="font-black uppercase text-[10px] tracking-widest">{label}</span>
-                                    </button>
-                                ))}
-                            </nav>
+  const loadPreset = (type) => {
+    if (type === 'coach') {
+      setBrand({ ...defaultBrand, brand_name:'GrowthPilot', audience:'Solopreneure & Coaches', offer:'Positionierung + Content-Retainer', usps:['1:1 Content Sprint','Messbare Lead-Ziele'] });
+      setCampaign({ ...defaultCampaign, niche:'Business Coaching', content_pillar:'Positionierung & Sales' });
+    }
+    if (type === 'freelancer') {
+      setBrand({ ...defaultBrand, brand_name:'PixelWerk', audience:'KMU mit altem Webauftritt', offer:'Website-Relaunch in 21 Tagen', usps:['Fixpreis','SEO-Basis inklusive'] });
+      setCampaign({ ...defaultCampaign, niche:'Webdesign', content_pillar:'Before/After Cases' });
+    }
+    if (type === 'saas') {
+      setBrand({ ...defaultBrand, brand_name:'DataNexus', audience:'B2B SaaS Marketing Teams', offer:'Demand Gen System mit Attribution', usps:['Funnel-Dashboard','MQL->SQL Optimierung'] });
+      setCampaign({ ...defaultCampaign, niche:'B2B SaaS', content_pillar:'Funnel KPI Education' });
+    }
+  };
 
-                            <div className="bg-[#103030] rounded-[2rem] p-6 text-white shadow-2xl mt-auto relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
-                                <p className="text-sm font-black uppercase leading-tight mb-1 truncate relative z-10">{brand.brand_name || 'Deine Brand'}</p>
-                                <p className="text-[10px] text-slate-400 italic line-clamp-1 relative z-10">{brand.offer}</p>
-                            </div>
-                        </aside>
+  return <div className="min-h-screen p-4 md:p-10 flex justify-center">
+    <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+      <aside className="space-y-6 flex flex-col">
+        <div className="bg-white border p-8 rounded-[2.5rem] text-center">
+          <h1 className="text-2xl font-black tracking-tighter text-[#103030] uppercase leading-none">SMART<span className="text-[#F8D800]">HIRN</span></h1>
+          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-2">System Kit v2</p>
+        </div>
+        <nav className="space-y-2">
+          {[['brand','ShieldCheck','Brand'],['campaign','Target','Strategie'],['toolkit','BookOpen','System-Kit'],['generator','Zap','Prompt Engine']].map(([id,icon,label]) =>
+            <button key={id} onClick={()=>setActiveTab(id)} className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl ${activeTab===id?'bg-[#103030] text-[#F8D800]':'bg-white text-slate-500'}`}>
+              <Icon name={icon}/><span className="font-black uppercase text-[10px] tracking-widest">{label}</span>
+            </button>)}
+        </nav>
+        <div className="bg-[#103030] rounded-[2rem] p-5 text-white mt-auto">
+          <p className="font-black text-sm truncate">{brand.brand_name || 'Deine Brand'}</p>
+          <p className="text-[11px] text-slate-300 line-clamp-2">{brand.offer}</p>
+        </div>
+      </aside>
 
-                        {/* Content Area */}
-                        <main className="bg-white border border-slate-200 rounded-[3rem] shadow-xl overflow-hidden min-h-[800px] flex flex-col">
-                            <div className="p-8 md:p-12 flex-1 overflow-y-auto custom-scroll">
-                                
-                                {activeTab === 'brand' && (
-                                    <div className="space-y-10 animate-in">
-                                        <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">01. Brand Setup</h2>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                            <div className="space-y-8">
-                                                <InputField label="Markenname" icon="Briefcase" value={brand.brand_name} onChange={(v) => updateBrand('brand_name', v)} />
-                                                <InputField label="Zielgruppe" icon="Users" value={brand.audience} onChange={(v) => updateBrand('audience', v)} />
-                                                <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Angebot</label>
-                                                    <textarea 
-                                                        value={brand.offer}
-                                                        onChange={(e) => updateBrand('offer', e.target.value)}
-                                                        className="w-full h-24 bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-medium focus:outline-none focus:border-[#103030] shadow-sm"
-                                                    />
-                                                </div>
-                                                <TagInput label="Wettbewerber" icon="Target" tags={brand.competitors} onAdd={(t) => updateBrand('competitors', [...brand.competitors, t])} onRemove={(t) => updateBrand('competitors', brand.competitors.filter(x => x !== t))} />
-                                            </div>
-                                            <div className="space-y-8">
-                                                <MultiSelectChannels selectedChannels={brand.channels} onChange={(v) => updateBrand('channels', v)} />
-                                                <TagInput label="USPs (Alleinstellungsmerkmale)" icon="Star" tags={brand.usps} colorClass="bg-blue-50" onAdd={(t) => updateBrand('usps', [...brand.usps, t])} onRemove={(t) => updateBrand('usps', brand.usps.filter(x => x !== t))} />
-                                                <TagInput label="Brand Voice" icon="Mic" tags={brand.brand_voice} colorClass="bg-[#F8D800]/20" onAdd={(t) => updateBrand('brand_voice', [...brand.brand_voice, t])} onRemove={(t) => updateBrand('brand_voice', brand.brand_voice.filter(x => x !== t))} />
-                                                <TagInput label="No-Go Wörter" icon="Trash2" tags={brand.no_gos} colorClass="bg-red-50" onAdd={(t) => updateBrand('no_gos', [...brand.no_gos, t])} onRemove={(t) => updateBrand('no_gos', brand.no_gos.filter(x => x !== t))} />
-                                                <InputField label="CTA (Call to Action)" value={brand.cta} onChange={(v) => updateBrand('cta', v)} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+      <main className="bg-white border rounded-[3rem] shadow-xl min-h-[820px] p-8 md:p-12 overflow-y-auto custom-scroll">
+        {activeTab==='brand' && <div className="space-y-8 animate-in">
+          <h2 className="text-4xl font-black text-[#103030] uppercase">01. Brand Setup</h2>
+          <div className="flex flex-wrap gap-2">{['coach','freelancer','saas'].map(p => <button key={p} onClick={()=>loadPreset(p)} className="px-3 py-2 text-xs rounded-full border bg-slate-50">Preset: {p}</button>)}</div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <InputField label="Markenname" value={brand.brand_name} onChange={(v)=>updateBrand('brand_name',v)} icon="Briefcase"/>
+              <InputField label="Zielgruppe" value={brand.audience} onChange={(v)=>updateBrand('audience',v)} icon="Users"/>
+              <InputField label="Angebot" value={brand.offer} onChange={(v)=>updateBrand('offer',v)} icon="Package"/>
+              <TagInput label="Wettbewerber" tags={brand.competitors} onAdd={(t)=>updateBrand('competitors',[...brand.competitors,t])} onRemove={(t)=>updateBrand('competitors',brand.competitors.filter(x=>x!==t))}/>
+            </div>
+            <div className="space-y-6">
+              <TagInput label="USPs" tags={brand.usps} onAdd={(t)=>updateBrand('usps',[...brand.usps,t])} onRemove={(t)=>updateBrand('usps',brand.usps.filter(x=>x!==t))}/>
+              <TagInput label="Brand Voice" tags={brand.brand_voice} onAdd={(t)=>updateBrand('brand_voice',[...brand.brand_voice,t])} onRemove={(t)=>updateBrand('brand_voice',brand.brand_voice.filter(x=>x!==t))}/>
+              <TagInput label="No-Go Wörter" tags={brand.no_gos} onAdd={(t)=>updateBrand('no_gos',[...brand.no_gos,t])} onRemove={(t)=>updateBrand('no_gos',brand.no_gos.filter(x=>x!==t))}/>
+              <InputField label="CTA-Ziel" value={brand.cta} onChange={(v)=>updateBrand('cta',v)} icon="Send"/>
+            </div>
+          </div>
+        </div>}
 
-                                {activeTab === 'campaign' && (
-                                    <div className="space-y-10 animate-in">
-                                        <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">02. Strategie Setup</h2>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="bg-slate-50 p-10 rounded-[3rem] border border-slate-200/60 space-y-8">
-                                                <h3 className="text-[#103030] font-black uppercase text-[10px] tracking-[0.2em] opacity-60">Funnel Stage</h3>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {['awareness', 'consideration', 'conversion'].map(stage => (
-                                                        <button key={stage} onClick={() => updateCampaign('funnel_stage', stage)} className={`py-5 px-6 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border-2 transition-all ${campaign.funnel_stage === stage ? 'bg-[#103030] border-[#103030] text-[#F8D800] shadow-lg' : 'bg-white border-slate-200 text-slate-400'}`}>
-                                                            {stage}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="space-y-8">
-                                                <InputField label="Kampagnen-Ziel" icon="Flag" value={campaign.objective} onChange={(v) => updateCampaign('objective', v)} />
-                                                <InputField label="Segment" value={campaign.audience_segment} onChange={(v) => updateCampaign('audience_segment', v)} />
-                                                <InputField label="Inhaltstyp" value={campaign.content_pillar} onChange={(v) => updateCampaign('content_pillar', v)} />
-                                                <div className="space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Tonalität</label>
-                                                    <select value={campaign.tone} onChange={(e) => updateCampaign('tone', e.target.value)} className="w-full bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 text-slate-700 font-bold uppercase text-[11px] tracking-widest focus:outline-none focus:border-[#103030] shadow-sm appearance-none cursor-pointer">
-                                                        <option value="bold">Bold</option>
-                                                        <option value="empathic">Empathisch</option>
-                                                        <option value="authoritative">Kompetent</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+        {activeTab==='campaign' && <div className="space-y-8 animate-in">
+          <h2 className="text-4xl font-black text-[#103030] uppercase">02. Strategie Setup</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <InputField label="Nische" value={campaign.niche} onChange={(v)=>updateCampaign('niche',v)} icon="Compass"/>
+              <InputField label="Kampagnen-Ziel" value={campaign.objective} onChange={(v)=>updateCampaign('objective',v)} icon="Flag"/>
+              <InputField label="Segment" value={campaign.audience_segment} onChange={(v)=>updateCampaign('audience_segment',v)} icon="Users"/>
+              <InputField label="Content-Pillar" value={campaign.content_pillar} onChange={(v)=>updateCampaign('content_pillar',v)} icon="Layers"/>
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Funnel Stage</label>
+                <div className="grid grid-cols-3 gap-2">{['awareness','consideration','conversion'].map(s => <button key={s} onClick={()=>updateCampaign('funnel_stage',s)} className={`py-2 rounded-xl text-xs uppercase ${campaign.funnel_stage===s?'bg-[#103030] text-[#F8D800]':'bg-slate-100 text-slate-500'}`}>{s}</button>)}</div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Tonalität</label>
+                <select value={campaign.tone} onChange={(e)=>updateCampaign('tone', e.target.value)} className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3">
+                  <option value="bold">Bold</option><option value="empathic">Empathisch</option><option value="authoritative">Kompetent</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>}
 
-                                {activeTab === 'generator' && (
-                                    <div className="h-full space-y-8 animate-in flex flex-col items-center">
-                                        <div className="text-center space-y-4 max-w-xl">
-                                            <div className="w-20 h-20 bg-[#103030] rounded-full flex items-center justify-center mx-auto shadow-2xl mb-4">
-                                                <Icon name="Zap" size={32} className="text-[#F8D800] fill-[#F8D800]" />
-                                            </div>
-                                            <h2 className="text-4xl font-black text-[#103030] uppercase tracking-tight">Prompt Engine</h2>
-                                            <p className="text-slate-400 text-sm font-medium italic">Dein maßgeschneiderter Master-Prompt ist bereit.</p>
-                                        </div>
+        {activeTab==='toolkit' && <div className="space-y-8 animate-in">
+          <h2 className="text-4xl font-black text-[#103030] uppercase">03. Digitales System-Kit</h2>
+          <div className="flex flex-wrap gap-2">{['A','B','C','D'].map(p => <button key={p} onClick={()=>setToolkitPart(p)} className={`px-4 py-2 rounded-full text-xs font-black ${toolkitPart===p?'bg-[#103030] text-[#F8D800]':'bg-slate-100 text-slate-500'}`}>Teil {p}</button>)}</div>
 
-                                        <div className="w-full max-w-3xl relative group">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-[#103030] to-slate-800 rounded-[2.5rem] transform rotate-1 opacity-5 group-hover:rotate-0 transition-transform"></div>
-                                            <div className="relative bg-white border-2 border-slate-100 rounded-[2.5rem] shadow-2xl overflow-hidden">
-                                                <div className="bg-slate-50 border-b border-slate-100 px-8 py-4 flex justify-between items-center">
-                                                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Master Prompt v1.0</span>
-                                                    <button 
-                                                        onClick={copyToClipboard}
-                                                        className={`flex items-center gap-2 px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-widest transition-all ${copied ? 'bg-green-500 text-white' : 'bg-[#F8D800] text-[#103030] hover:scale-105 shadow-md active:scale-95'}`}
-                                                    >
-                                                        <Icon name={copied ? "Check" : "Copy"} size={14} />
-                                                        {copied ? "Kopiert!" : "Prompt Kopieren"}
-                                                    </button>
-                                                </div>
-                                                <div className="p-8 max-h-[400px] overflow-y-auto custom-scroll font-mono text-[11px] leading-relaxed text-slate-600 whitespace-pre-wrap">
-                                                    {fullPrompt}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="flex gap-4 items-center text-[10px] font-bold text-slate-300 uppercase tracking-widest pt-4">
-                                            <span className="flex items-center gap-1"><Icon name="Lock" size={12} /> Privacy First</span>
-                                            <span>•</span>
-                                            <span className="flex items-center gap-1"><Icon name="Cpu" size={12} /> Local Storage</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </main>
-                    </div>
-                </div>
-            );
-        };
+          {toolkitPart==='A' && <div className="space-y-4">
+            <p className="text-sm text-slate-600">Teil A: Plane in 60 Minuten deine Content-Struktur.</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="border rounded-2xl p-4"><h3 className="font-black">12 Themen-Ideen</h3><p className="text-sm text-slate-500">Nutze die 12 Themenwinkel als Post-Ideen-Pool.</p></div>
+              <div className="border rounded-2xl p-4"><h3 className="font-black">6 Serien-Frameworks</h3><ul className="list-disc ml-5 text-sm text-slate-600">{CONTENT_SERIES.map(s=><li key={s}>{s}</li>)}</ul></div>
+            </div>
+          </div>}
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+          {toolkitPart==='B' && <div className="space-y-4">
+            <p className="text-sm text-slate-600">Teil B: Caption-System mit Vorlagen und CTA-Bibliothek.</p>
+            <div className="grid md:grid-cols-2 gap-3">{CAPTION_TEMPLATES.map(t => <div key={t} className="border rounded-xl px-4 py-3 text-sm">{t}</div>)}</div>
+            <div className="border rounded-2xl p-4">
+              <h3 className="font-black mb-2">10 CTA-Muster</h3>
+              <p className="text-sm text-slate-600">Soft Engagement, Binary Choice, Story-Aufforderung, Tool-Frage, Next Step („Schreib JA“), Save-Reminder u.v.m.</p>
+            </div>
+          </div>}
+
+          {toolkitPart==='C' && <div className="space-y-4">
+            <p className="text-sm text-slate-600">Teil C: Prompt-Pack (15 Master-Prompts) ist direkt im Generator verdrahtet.</p>
+            <div className="grid md:grid-cols-2 gap-3">{PROMPT_TEMPLATES.map(p => <button key={p.id} onClick={()=>{setSelectedPromptId(p.id); setActiveTab('generator');}} className="text-left border rounded-xl p-4 hover:border-[#103030]"><p className="text-xs uppercase text-slate-400">{p.category}</p><p className="font-black text-sm">{p.title}</p></button>)}</div>
+          </div>}
+
+          {toolkitPart==='D' && <div className="space-y-4">
+            <p className="text-sm text-slate-600">Teil D: Mini-Funnel + Tracking für Leads statt Vanity-Metrics.</p>
+            <div className="grid md:grid-cols-3 gap-3">{FREEBIES.map(f => <div key={f} className="border rounded-xl p-4"><h4 className="font-black text-sm">{f}</h4></div>)}</div>
+            <div className="border rounded-2xl p-4">
+              <h3 className="font-black">Tracking-Kernmetriken</h3>
+              <p className="text-sm text-slate-600">Reach, Engagement (Comments/Saves), Profile Visits, Link Clicks, E-Mail Sign-ups.</p>
+            </div>
+          </div>}
+        </div>}
+
+        {activeTab==='generator' && <div className="space-y-6 animate-in">
+          <h2 className="text-4xl font-black text-[#103030] uppercase">04. Prompt Engine</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Master-Prompt Template (Teil C)</label>
+              <select value={selectedPromptId} onChange={(e)=>setSelectedPromptId(e.target.value)} className="w-full mt-2 border-2 border-slate-100 rounded-2xl px-4 py-3">
+                {PROMPT_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.category} · {t.title}</option>)}
+              </select>
+            </div>
+            <div className="text-sm text-slate-500 bg-slate-50 border rounded-2xl p-4">
+              <p className="font-black text-slate-700">{selectedPrompt?.title}</p>
+              <p>Kategorie: {selectedPrompt?.category}</p>
+            </div>
+          </div>
+          <div className="border-2 border-slate-100 rounded-[2rem] overflow-hidden">
+            <div className="bg-slate-50 px-6 py-3 flex justify-between items-center">
+              <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Master Prompt v2.0</span>
+              <button onClick={copyToClipboard} className={`px-4 py-2 rounded-full text-xs font-black ${copied?'bg-green-500 text-white':'bg-[#F8D800] text-[#103030]'}`}>{copied?'Kopiert!':'Prompt Kopieren'}</button>
+            </div>
+            <pre className="p-6 text-xs whitespace-pre-wrap text-slate-700 max-h-[450px] overflow-y-auto custom-scroll">{fullPrompt}</pre>
+          </div>
+        </div>}
+      </main>
+    </div>
+  </div>;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
 </body>
 </html>
