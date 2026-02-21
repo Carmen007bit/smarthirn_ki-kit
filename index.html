@@ -1045,7 +1045,10 @@
 
         function buildPrompt(templateId, data) {
             const brand = brandData;
-            let prompt = `Rolle: Du bist Content-Stratege.\n\n`;
+            let prompt = '';
+            
+            // Brand Context
+            prompt += `Rolle: Du bist Content-Stratege.\n\n`;
             prompt += `Brand-Kontext:\n`;
             prompt += `- Marke: ${brand.name || '[Marke]'}\n`;
             prompt += `- Angebot: ${brand.offering || '[Angebot]'}\n`;
@@ -1054,10 +1057,48 @@
             prompt += `- USPs: ${brand.usps || '[USPs]'}\n`;
             prompt += `- Tonalität: ${brand.voice || 'direkt'}\n`;
             if (brand.noGos) prompt += `- No-Go-Wörter: ${brand.noGos}\n`;
-            prompt += `\nAufgabe:\n[Template-spezifischer Inhalt basierend auf ${templateId}]\n`;
-            prompt += `\nAnti-Generic-Rules:\n1. Keine Buzzwords\n2. Konkrete Zahlen\n3. Kurze Sätze (max 15 Wörter)\n4. ${brand.voice} Tonalität\n`;
+            prompt += `\n`;
+            
+            // Template-specific instructions
+            prompt += getTemplatePrompt(templateId, data);
+            
+            // Anti-Generic Rules
+            prompt += `\nAnti-Generic-Rules (ZWINGEND):\n`;
+            prompt += `1. Keine Buzzwords/Floskeln aus No-Go-Liste\n`;
+            prompt += `2. Konkrete Zahlen/Beispiele statt vage Claims\n`;
+            prompt += `3. Kurze Sätze (max 15 Wörter)\n`;
+            prompt += `4. Aktive Sprache, kein Passiv\n`;
+            prompt += `5. Spezifische CTAs (nicht nur "Was denkst du?")\n`;
+            prompt += `6. Brand Voice einhalten: ${brand.voice || 'direkt'}\n`;
+            prompt += `7. Persönliche Note (aus eigener Erfahrung)\n`;
             
             return prompt;
+        }
+
+        function getTemplatePrompt(id, data) {
+            const prompts = {
+                'instagram-post': `Aufgabe:\nErstelle einen Instagram-Post über "${data.topic}".\n\nZiel: ${data.goal}\nCaption-Typ: ${data.captionType} (aus System-Kit Teil B)\n\nStruktur:\n- Hook (erste 2 Sätze - max 12 Wörter)\n- 3 Kernpunkte (je 1-2 Sätze)\n- CTA (spezifische Frage, keine generische)\n\nMax. 150 Wörter gesamt.\n`,
+                
+                'linkedin-thought': `Aufgabe:\nErstelle einen LinkedIn Thought Leadership Post.\n\nThese: "${data.thesis}"\nBeweis/Daten: ${data.proof}\n\nStruktur:\n- Hook mit These (provokativ)\n- 3-4 Belege/Argumente mit Daten\n- Persönliche Perspektive (1-2 Sätze)\n- CTA zur Diskussion\n\nTonalität: Professionell aber meinungsstark\nMax. 300 Wörter.\n`,
+                
+                'hooks-generator': `Aufgabe:\nGeneriere 30 verschiedene Hooks zum Thema "${data.mainTopic}".\n\nAnsätze (je 3 Hooks):\n1. Controversial Take\n2. Data-Driven (mit Zahl)\n3. Personal Story (Ich-Perspektive)\n4. Question-First (provokante Frage)\n5. Myth-Busting ("Man sagt X, aber...")\n6. Before/After (Transformation)\n7. "Nobody talks about..."\n8. Reverse Psychology ("Hör auf mit X")\n9. Unpopular Opinion\n10. Contrast (Most vs Best)\n\nRegeln:\n- Max 12 Wörter pro Hook\n- Keine Emojis\n- Keine generischen Einstiege\n- Jeder Hook muss unique sein\n`,
+                
+                'carousel': `Aufgabe:\nErstelle ein Instagram Carousel mit ${data.slides} Slides zum Thema "${data.carouselTopic}".\n\nPro Slide:\n- Überschrift (max 5 Wörter, groß gedacht)\n- 2-3 Bullet Points (je 1 Satz)\n- Visueller Hinweis (Icon-Vorschlag oder Farbe)\n\nSlide-Struktur:\nSlide 1: Hook (Problem oder steile These)\nSlide 2-${data.slides-1}: Content (je 1 Hauptpunkt pro Slide)\nSlide ${data.slides}: CTA + Zusammenfassung\n\nWichtig:\n- Jeder Slide muss standalone verständlich sein\n- Keine Wiederholungen zwischen Slides\n- Klarer roter Faden\n`,
+                
+                'reel-script': `Aufgabe:\nSchreibe ein ${data.duration} Video-Script zum Thema "${data.videoTopic}".\n\nFormat:\n[0-3s] Hook (visuell beschreiben + Text-Overlay)\n[3-15s] Setup/Problem (zeigen, nicht nur erzählen)\n[15-${parseInt(data.duration)-10}s] Lösung/Content (3 konkrete Punkte)\n[${parseInt(data.duration)-10}s-${data.duration}] CTA + Abschluss\n\nWichtig:\n- Jede Sekunde zählt - kein Füllmaterial\n- Visuelle Anweisungen in [Klammern]\n- Text-Overlays separat markieren\n- B-Roll-Vorschläge wo sinnvoll\n`,
+                
+                'meta-ad': `Aufgabe:\nErstelle Meta Ad Copy für "${data.product}".\n\nAngebot: ${data.offer}\n\n2 Varianten:\n\nVariante A (Problem-fokussiert):\n- Headline (max 40 Zeichen)\n- Primary Text: Startet mit Problem, dann Lösung (125 Wörter)\n- CTA-Button (max 20 Zeichen)\n\nVariante B (Benefit-fokussiert):\n- Headline (max 40 Zeichen)\n- Primary Text: Startet mit Ergebnis, dann How (125 Wörter)\n- CTA-Button (max 20 Zeichen)\n\nBeide Varianten:\n- Social Proof einbauen (wenn möglich)\n- Dringlichkeit schaffen (ohne Bullshit)\n- Klar kommunizieren was passiert nach Klick\n`,
+                
+                'email-sequence': `Aufgabe:\nErstelle eine ${data.emailCount}-E-Mail-Sequenz für Freebie "${data.freebie}".\n\nE-Mail 1 (sofort nach Anmeldung):\n- Betreff: [Catchy, max 50 Zeichen]\n- Willkommen + Download-Link prominent\n- Kurze Vorstellung (wer bin ich, warum das wichtig ist)\n- PS mit Vorschau auf nächste E-Mail\nMax. 100 Wörter\n\nE-Mail 2 (3 Tage später):\n- Betreff: [Bezug zu E-Mail 1]\n- Zusätzlicher Tipp (über Freebie hinaus)\n- Kurze Story oder Beispiel\n- Frage zur Interaktion\nMax. 150 Wörter\n\nE-Mail 3 (7 Tage später):\n- Betreff: [Benefit-orientiert]\n- Zusammenfassung Wert geliefert\n- Soft-Pitch für nächsten Schritt\n- 2 Optionen: [Angebot] oder weiter kostenlos folgen\n- Kein Druck, ehrlich kommunizieren\nMax. 200 Wörter\n`,
+                
+                'landing-page': `Aufgabe:\nSchreibe Landing Page Copy für "${data.lpProduct}".\n\nHauptnutzen: ${data.mainBenefit}\n\nSections:\n\n1. Hero Section:\n- Headline (max 10 Wörter, benefit-driven)\n- Subheadline (max 20 Wörter, spezifiziert wer/was)\n- CTA-Button-Text\n\n2. Benefits (3 Stück):\n- Je 1 Überschrift + 2-3 Sätze Erklärung\n- Fokus auf Outcome, nicht Features\n\n3. Social Proof:\n- 1 starkes Testimonial (erfinden mit realistischen Details)\n- Zahlen/Stats wenn möglich\n\n4. Final CTA:\n- Headline (What happens next)\n- CTA-Button\n- Trust-Elemente (Geld-zurück, etc.)\n`,
+                
+                'twitter-thread': `Aufgabe:\nSchreibe einen Twitter/X Thread (8-12 Tweets) über "${data.threadTopic}".\n\nTweet 1 (Hook):\n- Starke Behauptung oder Frage\n- Muss scrollen stoppen\n- Max 280 Zeichen\n- Endet mit "🧵" oder "Thread:"\n\nTweet 2-10 (Content):\n- 1 Hauptpunkt pro Tweet\n- Jeder Tweet standalone lesbar\n- Nummerierung (1/10, 2/10, etc.)\n- Mix aus Fakten, Beispielen, Meinungen\n\nLetzter Tweet:\n- Zusammenfassung (1 Satz)\n- CTA (Follow, Like, Retweet)\n- Optional: Link zu Deep-Dive\n\nWichtig:\n- Jeder Tweet max 280 Zeichen\n- Keine Hashtags (außer 1-2 am Ende)\n- Klare Struktur, roter Faden\n`,
+                
+                'case-study': `Aufgabe:\nSchreibe eine Case Study.\n\nAusgangssituation: ${data.before}\nErgebnis: ${data.after}\n\nStruktur:\n\n1. Ausgangssituation (2-3 Sätze):\n- Konkrete Zahlen und Details\n- Hauptproblem benennen\n\n2. Prozess (3 konkrete Schritte):\n- Was genau wurde gemacht\n- Zeitrahmen angeben\n- Herausforderungen erwähnen\n\n3. Ergebnis (mit Zahlen):\n- Vorher/Nachher-Vergleich\n- Spezifische Metriken\n- Zeitraum angeben\n\n4. Lektion/Takeaway:\n- Was war der Game-Changer\n- Was würdest du anders machen\n- 1 konkreter Tipp für Leser\n\nGesamt: 300-400 Wörter\n`
+            };
+            
+            return prompts[id] || `Aufgabe:\nErstelle Content für Template "${id}".\n\nParameter:\n${JSON.stringify(data, null, 2)}\n`;
         }
 
         // ==========================================
