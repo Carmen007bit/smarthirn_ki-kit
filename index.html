@@ -50,35 +50,6 @@
             font-weight: 700;
         }
         
-        .api-key-banner {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 2px solid #fbbf24;
-            color: #92400e;
-            padding: 1.5rem 2rem;
-            border-radius: 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .api-key-banner.success {
-            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-            border-color: #86efac;
-            color: #166534;
-        }
-        .api-key-banner strong { font-size: 1.1rem; display: block; margin-bottom: 0.25rem; }
-        .api-key-banner button {
-            background: #103030;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .api-key-banner button:hover { background: #1a4545; transform: translateY(-2px); }
-        
         .grid { display: grid; grid-template-columns: 380px 1fr; gap: 2rem; }
         
         .sidebar {
@@ -138,9 +109,9 @@
         }
         
         input[type="text"],
-        input[type="password"],
         textarea,
-        select {
+        select,
+        input[type="number"] {
             width: 100%;
             padding: 0.85rem 1.25rem;
             border: 2px solid #E5E7EB;
@@ -169,22 +140,14 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            justify-content: center;
         }
         .btn-primary {
             background: #F8D800;
             color: #111827;
             width: 100%;
-            justify-content: center;
         }
         .btn-primary:hover { background: #e0c400; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(248, 216, 0, 0.3); }
-        .btn-primary:disabled {
-            background: #E5E7EB;
-            color: #9CA3AF;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-secondary { background: #103030; color: white; }
-        .btn-secondary:hover { background: #1a4545; }
         .btn-outline {
             background: transparent;
             border: 2px solid #103030;
@@ -287,22 +250,6 @@
             line-height: 1.8;
         }
         
-        .ai-output {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border: 2px solid #86efac;
-            border-radius: 1.25rem;
-            padding: 1.75rem;
-            margin-top: 1.5rem;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        .ai-output pre {
-            font-family: 'Inter', sans-serif;
-            white-space: pre-wrap;
-            line-height: 1.8;
-            color: #111827;
-        }
-        
         .status {
             padding: 1rem 1.25rem;
             border-radius: 1rem;
@@ -316,149 +263,6 @@
             background: #dcfce7;
             color: #166534;
             border: 2px solid #bbf7d0;
-        }
-        .status.error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 2px solid #fecaca;
-        }
-        .status.info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 2px solid #bfdbfe;
-        }
-        .status.warning {
-            background: #fef3c7;
-            color: #92400e;
-            border: 2px solid #fde68a;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #E5E7EB;
-            padding-bottom: 0.5rem;
-        }
-        .tab {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background: none;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-        .tab:hover { color: #103030; }
-        .tab.active {
-            color: #103030;
-            border-bottom-color: #F8D800;
-        }
-        
-        .hidden { display: none !important; }
-        
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: #666;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .spinner {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #E5E7EB;
-            border-top-color: #F8D800;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 0.75rem;
-        }
-        
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 2rem;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 2rem;
-            padding: 2.5rem;
-            max-width: 700px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .modal-header h2 {
-            font-size: 1.75rem;
-            color: #103030;
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-            padding: 0.5rem;
-        }
-        .modal-close:hover { color: #103030; }
-        
-        .tutorial-step {
-            background: rgba(16, 48, 48, 0.05);
-            border-left: 4px solid #F8D800;
-            padding: 1.25rem;
-            margin-bottom: 1.25rem;
-            border-radius: 0.75rem;
-        }
-        .tutorial-step h3 {
-            color: #103030;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-        .tutorial-step p {
-            color: #666;
-            line-height: 1.7;
-        }
-        .tutorial-step ol {
-            margin: 0.75rem 0 0 1.5rem;
-            color: #666;
-        }
-        .tutorial-step ol li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
-        }
-        
-        .example-box {
-            background: #f0fdf4;
-            border: 2px solid #86efac;
-            border-radius: 1rem;
-            padding: 1.25rem;
-            margin: 1rem 0;
-            font-size: 0.9rem;
-        }
-        .example-box strong {
-            color: #166534;
-            display: block;
-            margin-bottom: 0.5rem;
         }
         
         .pro-tip {
@@ -475,33 +279,78 @@
             font-size: 1rem;
         }
         
-        .code-block {
-            background: #1f2937;
-            color: #e5e7eb;
-            padding: 1rem 1.25rem;
-            border-radius: 0.75rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            margin: 1rem 0;
-            overflow-x: auto;
+        .hidden { display: none !important; }
+        
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            
+            .header {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
+            .header h1 { font-size: 2rem; }
+            .header .tagline { font-size: 1rem; }
+            .header .version { font-size: 0.75rem; padding: 0.4rem 0.75rem; }
+            
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .sidebar, .main-content {
+                padding: 1.5rem;
+                border-radius: 1.25rem;
+            }
+            
+            .template-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .template-categories {
+                flex-wrap: wrap;
+            }
+            .category-filter {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.75rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            .action-buttons button {
+                width: 100%;
+            }
+            
+            .result-box {
+                font-size: 0.85rem;
+                padding: 1.25rem;
+                max-height: 400px;
+            }
+            
+            .pro-tip {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            label { font-size: 0.9rem; }
+            input, textarea, select {
+                font-size: 0.9rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.9rem;
+            }
         }
         
-        .api-key-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-        .api-key-status.connected {
-            background: #dcfce7;
-            color: #166534;
-        }
-        .api-key-status.disconnected {
-            background: #fee2e2;
-            color: #991b1b;
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.75rem; }
+            .template-card h3 { font-size: 1rem; }
+            .template-card p { font-size: 0.8rem; }
+            .section-title { font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -510,39 +359,14 @@
         <div class="header">
             <div class="header-content">
                 <h1>PROMPT<span class="highlight">ENGINE</span></h1>
-                <p class="tagline">AI-powered Prompt-Generierung für deine Brand</p>
+                <p class="tagline">Erstelle perfekte Prompts für deine Brand in Sekunden</p>
                 <span class="version">🚀 Version 2.0 • Ergänzt dein System-Kit</span>
             </div>
-        </div>
-        
-        <!-- API KEY BANNER -->
-        <div id="apiKeyBanner" class="api-key-banner">
-            <div>
-                <strong>🔑 Claude API-Key erforderlich</strong>
-                <p style="margin:0">Für AI-Features brauchst du einen kostenlosen Anthropic API-Key ($5 Free Credits = ~500 Posts)</p>
-            </div>
-            <button onclick="openAPISetup()">API-Key einrichten</button>
         </div>
         
         <div class="grid">
             <!-- SIDEBAR -->
             <div class="sidebar">
-                <!-- API KEY SECTION -->
-                <div class="section">
-                    <div class="section-title">
-                        🔑 API-Key Status
-                    </div>
-                    <div id="apiKeyStatus" class="api-key-status disconnected">
-                        ❌ Nicht verbunden
-                    </div>
-                    <button class="btn btn-outline" onclick="openAPISetup()" style="margin-top:1rem;width:100%">
-                        ⚙️ API-Key verwalten
-                    </button>
-                </div>
-                
-                <hr style="border:none;border-top:2px solid #E5E7EB;margin:2rem 0">
-                
-                <!-- BRAND IDENTITY -->
                 <div class="section">
                     <div class="section-title">
                         📊 Brand Identity
@@ -560,7 +384,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>Zielgruppe <span class="hint">(genau wie im System-Kit)</span></label>
+                        <label>Zielgruppe <span class="hint">(aus Teil A)</span></label>
                         <input type="text" id="audience" placeholder="z.B. Solopreneure, 1-3 Jahre selbstständig">
                     </div>
                     
@@ -587,7 +411,7 @@
                     
                     <div class="form-group">
                         <label>No-Go-Wörter <span class="hint">(aus Teil C)</span></label>
-                        <textarea id="noGos" placeholder="Entdecke, Revolutionär, Game-Changer, Tauche ein"></textarea>
+                        <textarea id="noGos" placeholder="Entdecke, Revolutionär, Game-Changer"></textarea>
                     </div>
                     
                     <div class="action-buttons">
@@ -601,159 +425,47 @@
             
             <!-- MAIN CONTENT -->
             <div class="main-content">
-                <div class="tabs">
-                    <button class="tab active" onclick="switchTab('templates')">📝 Templates (22)</button>
-                    <button class="tab" onclick="switchTab('ai')">🤖 AI Generator</button>
+                <div class="section-title">🎯 Wähle ein Template (22)</div>
+                
+                <div class="template-categories">
+                    <button class="category-filter active" onclick="filterCategory('all')">Alle</button>
+                    <button class="category-filter" onclick="filterCategory('social')">Social Media (9)</button>
+                    <button class="category-filter" onclick="filterCategory('ads')">Ads (2)</button>
+                    <button class="category-filter" onclick="filterCategory('email')">E-Mail (4)</button>
+                    <button class="category-filter" onclick="filterCategory('content')">Content (7)</button>
                 </div>
                 
-                <!-- TEMPLATES TAB -->
-                <div id="templatesTab">
-                    <div class="section-title">🎯 Wähle ein Template</div>
+                <div class="template-grid" id="templateGrid"></div>
+                
+                <div id="templateInputs" class="hidden">
+                    <div class="section-title">⚙️ Template-Einstellungen</div>
+                    <div id="dynamicInputs"></div>
                     
-                    <div class="template-categories">
-                        <button class="category-filter active" onclick="filterCategory('all')">Alle</button>
-                        <button class="category-filter" onclick="filterCategory('social')">Social Media</button>
-                        <button class="category-filter" onclick="filterCategory('ads')">Ads</button>
-                        <button class="category-filter" onclick="filterCategory('email')">E-Mail</button>
-                        <button class="category-filter" onclick="filterCategory('content')">Content</button>
-                    </div>
-                    
-                    <div class="template-grid" id="templateGrid"></div>
-                    
-                    <div id="templateInputs" class="hidden">
-                        <div class="section-title">⚙️ Template-Einstellungen</div>
-                        <div id="dynamicInputs"></div>
-                        
-                        <div class="action-buttons" style="margin-top: 1.5rem;">
-                            <button class="btn btn-primary" onclick="generatePrompt()">
-                                ✨ Prompt Generieren
-                            </button>
-                            <button class="btn btn-secondary" onclick="generateWithAI()" id="aiGenBtn">
-                                🤖 Mit AI erstellen
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="output" class="hidden">
-                        <div class="section-title">📝 Generierter Prompt</div>
-                        <div class="result-box" id="resultBox"></div>
-                        <div class="action-buttons">
-                            <button class="btn btn-primary" onclick="copyPrompt()">📋 Kopieren</button>
-                        </div>
-                    </div>
-                    
-                    <div id="aiOutput" class="hidden">
-                        <div class="section-title">🤖 AI-Generierter Content</div>
-                        <div class="ai-output" id="aiResultBox"></div>
-                        <div class="action-buttons">
-                            <button class="btn btn-primary" onclick="copyAI()">📋 Kopieren</button>
-                        </div>
-                    </div>
+                    <button class="btn btn-primary" onclick="generatePrompt()" style="margin-top: 1.5rem;">
+                        ✨ Prompt Generieren
+                    </button>
                 </div>
                 
-                <!-- AI TAB -->
-                <div id="aiTab" class="hidden">
-                    <div class="section-title">🤖 AI Content Generator</div>
-                    
-                    <div class="status info">
-                        💡 <strong>Wie funktioniert's?</strong> Beschreibe was du brauchst - die AI erstellt den fertigen Content direkt.
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Was möchtest du erstellen?</label>
-                        <textarea id="aiGoal" placeholder="z.B. Einen LinkedIn Post über meine Erfahrung als Solopreneur - warum ich auf 3x/Woche reduziert habe und trotzdem mehr Anfragen bekomme" style="min-height:150px"></textarea>
-                    </div>
+                <div id="output" class="hidden">
+                    <div class="section-title">📝 Generierter Prompt</div>
                     
                     <div class="pro-tip">
-                        <strong>💡 Pro-Tipp:</strong>
-                        Je spezifischer deine Beschreibung, desto besser das Ergebnis. Erwähne Zahlen, Beispiele, oder den gewünschten Stil.
+                        <strong>💡 Nächster Schritt:</strong>
+                        Kopiere diesen Prompt und füge ihn in <strong>claude.ai</strong> oder <strong>ChatGPT</strong> ein. Der Prompt enthält bereits deine Brand Identity und Anti-Generic-Rules.
                     </div>
                     
-                    <button class="btn btn-primary" onclick="generateAIContent()" id="aiCustomBtn">
-                        🚀 Content erstellen
+                    <div class="result-box" id="resultBox"></div>
+                    
+                    <button class="btn btn-primary" onclick="copyPrompt()" style="margin-top: 1rem;">
+                        📋 Prompt kopieren
                     </button>
-                    
-                    <div id="aiCustomOutput" class="hidden">
-                        <div class="section-title">🤖 Generierter Content</div>
-                        <div class="ai-output" id="aiCustomResultBox"></div>
-                        <div class="action-buttons">
-                            <button class="btn btn-primary" onclick="copyAICustom()">📋 Kopieren</button>
-                            <button class="btn btn-outline" onclick="regenerate()">🔄 Neu generieren</button>
-                        </div>
-                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- API KEY SETUP MODAL -->
-    <div id="apiSetupModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🔑 API-Key einrichten</h2>
-                <button class="modal-close" onclick="closeAPISetup()">✕</button>
-            </div>
-            
-            <div class="tutorial-step">
-                <h3>Schritt 1: Anthropic Account erstellen</h3>
-                <ol>
-                    <li>Gehe zu <a href="https://console.anthropic.com" target="_blank" style="color:#103030;font-weight:700">console.anthropic.com</a></li>
-                    <li>Klicke auf "Sign Up" (kostenlos)</li>
-                    <li>Verifiziere deine E-Mail</li>
-                    <li>Du bekommst <strong>$5 Free Credits</strong> (~500 Posts)</li>
-                </ol>
-            </div>
-            
-            <div class="tutorial-step">
-                <h3>Schritt 2: API-Key erstellen</h3>
-                <ol>
-                    <li>In der Console: Klicke auf "Get API Keys"</li>
-                    <li>Klicke auf "+ Create Key"</li>
-                    <li>Gib einen Namen ein (z.B. "PromptEngine")</li>
-                    <li>Kopiere den Key (beginnt mit <code>sk-...</code>)</li>
-                </ol>
-            </div>
-            
-            <div class="pro-tip">
-                <strong>⚠️ Wichtig:</strong>
-                Dein API-Key wird nur lokal in deinem Browser gespeichert. Wir sehen ihn nie. Du kannst ihn jederzeit löschen.
-            </div>
-            
-            <div class="form-group">
-                <label>Claude API-Key</label>
-                <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
-                <p style="font-size:0.85rem;color:#666;margin-top:0.5rem">
-                    Dein Key wird sicher im Browser gespeichert
-                </p>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="saveAPIKey()">💾 Key speichern</button>
-                <button class="btn btn-outline" onclick="testAPIKey()">🧪 Key testen</button>
-            </div>
-            
-            <div id="apiSetupStatus" class="hidden"></div>
-            
-            <div class="example-box" style="margin-top:2rem">
-                <strong>💰 Kosten:</strong>
-                Mit den $5 Free Credits kannst du ca. <strong>500 Posts</strong> generieren (Claude Sonnet 4: ~$0.01 pro Post).
-                Danach: Einfach mehr Credits kaufen oder weiter nur Prompts generieren (kostenlos).
             </div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIG & STATE
-        // ==========================================
-        let selectedTemplate = null;
-        let brandData = {};
-        let currentFilter = 'all';
-        let apiKey = '';
-
-        // ==========================================
-        // TEMPLATES DATABASE (verkürzt für Übersicht)
-        // ==========================================
+        // Templates mit erweiterten Input-Feldern
         const templates = [
             {
                 id: 'instagram-post',
@@ -761,16 +473,31 @@
                 category: 'social',
                 description: 'Quick Win Post für Feed',
                 inputs: [
-                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Produktivität ohne Burnout' },
+                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Kontinuität beim Training' },
                     { id: 'goal', label: 'Ziel', type: 'select', options: ['Awareness', 'Engagement', 'Conversion'] },
-                    { id: 'captionType', label: 'Caption-Typ (aus Teil B)', type: 'select', options: ['Personal Story', 'Controversial Take', 'Myth-Busting', 'Before/After', 'List-Style'] }
+                    { id: 'captionType', label: 'Caption-Typ (aus Teil B)', type: 'select', options: ['Personal Story', 'Controversial Take', 'Myth-Busting', 'Before/After', 'List-Style'] },
+                    { id: 'personalExample', label: 'Deine konkrete Story/Erfahrung', type: 'text', placeholder: 'z.B. Kunde hat trotz Job 6 Monate durchgehalten weil...' },
+                    { id: 'specificNumber', label: 'Konkrete Zahl aus deiner Erfahrung', type: 'text', placeholder: 'z.B. 73% meiner Kunden scheitern ohne Accountability' },
+                    { id: 'uniqueMethod', label: 'Was machst DU anders?', type: 'text', placeholder: 'z.B. Ich plane Training um Lebensrealität, nicht umgekehrt' }
+                ]
+            },
+            {
+                id: 'carousel',
+                name: 'Instagram Carousel',
+                category: 'social',
+                description: '5-10 Slides',
+                inputs: [
+                    { id: 'carouselTopic', label: 'Thema', type: 'text', placeholder: 'z.B. 5 Fehler beim Muskelaufbau' },
+                    { id: 'slides', label: 'Anzahl Slides', type: 'number', value: '7' },
+                    { id: 'ownMistake', label: 'Fehler den DU selbst gemacht hast', type: 'text', placeholder: 'z.B. Ich habe 2 Jahre zu wenig Protein gegessen' },
+                    { id: 'clientExample', label: 'Konkretes Kunden-Beispiel', type: 'text', placeholder: 'z.B. Kunde hat 6 Monate keine Fortschritte gemacht weil...' }
                 ]
             },
             {
                 id: 'linkedin-thought',
                 name: 'LinkedIn Thought Leadership',
                 category: 'social',
-                description: 'Meinungspost mit Position',
+                description: 'Meinungspost',
                 inputs: [
                     { id: 'thesis', label: 'Deine These', type: 'text', placeholder: 'z.B. Die meisten Freelancer sind zu günstig' },
                     { id: 'proof', label: 'Beweis/Daten', type: 'text', placeholder: 'z.B. 73% verdienen unter Mindestlohn' }
@@ -780,19 +507,9 @@
                 id: 'hooks-generator',
                 name: '30 Hook-Varianten',
                 category: 'content',
-                description: 'Verschiedene Hook-Ansätze',
+                description: 'Verschiedene Ansätze',
                 inputs: [
                     { id: 'mainTopic', label: 'Hauptthema', type: 'text', placeholder: 'z.B. E-Mail Marketing' }
-                ]
-            },
-            {
-                id: 'carousel',
-                name: 'Instagram Carousel',
-                category: 'social',
-                description: '5-10 Slides',
-                inputs: [
-                    { id: 'carouselTopic', label: 'Thema', type: 'text', placeholder: 'z.B. 5 Fehler bei Kundenakquise' },
-                    { id: 'slides', label: 'Anzahl Slides', type: 'number', value: '7' }
                 ]
             },
             {
@@ -816,6 +533,15 @@
                 ]
             },
             {
+                id: 'google-ads',
+                name: 'Google Ads RSA',
+                category: 'ads',
+                description: 'Responsive Search Ads',
+                inputs: [
+                    { id: 'keyword', label: 'Haupt-Keyword', type: 'text', placeholder: 'z.B. content planung tool' }
+                ]
+            },
+            {
                 id: 'email-sequence',
                 name: 'E-Mail Sequenz',
                 category: 'email',
@@ -823,6 +549,34 @@
                 inputs: [
                     { id: 'freebie', label: 'Freebie-Name', type: 'text', placeholder: 'z.B. Content-Plan Template' },
                     { id: 'emailCount', label: 'Anzahl E-Mails', type: 'number', value: '3' }
+                ]
+            },
+            {
+                id: 'cold-email',
+                name: 'Cold Outreach E-Mail',
+                category: 'email',
+                description: 'B2B Lead-Generierung',
+                inputs: [
+                    { id: 'targetCompany', label: 'Ziel-Branche', type: 'text', placeholder: 'z.B. SaaS Startups' },
+                    { id: 'painpoint', label: 'Problem', type: 'text', placeholder: 'z.B. Inkonsistenter Content' }
+                ]
+            },
+            {
+                id: 'newsletter',
+                name: 'Newsletter Template',
+                category: 'email',
+                description: 'Wöchentlicher Newsletter',
+                inputs: [
+                    { id: 'newsletterTheme', label: 'Thema/Stil', type: 'text', placeholder: 'z.B. Wöchentliche Marketing-Tipps' }
+                ]
+            },
+            {
+                id: 'testimonial-request',
+                name: 'Testimonial Request',
+                category: 'email',
+                description: 'Kunden um Review bitten',
+                inputs: [
+                    { id: 'customerName', label: 'Kunden-Segment', type: 'text', placeholder: 'z.B. Beta-Tester' }
                 ]
             },
             {
@@ -853,115 +607,91 @@
                     { id: 'before', label: 'Vorher', type: 'text', placeholder: 'z.B. 60h/Woche, 3.200€' },
                     { id: 'after', label: 'Nachher', type: 'text', placeholder: 'z.B. 30h/Woche, 7.500€' }
                 ]
+            },
+            {
+                id: 'sales-page',
+                name: 'Sales Page',
+                category: 'content',
+                description: 'Long-form Verkaufsseite',
+                inputs: [
+                    { id: 'salesProduct', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. Online-Kurs' }
+                ]
+            },
+            {
+                id: 'webinar-script',
+                name: 'Webinar Script',
+                category: 'content',
+                description: '45-60 Min',
+                inputs: [
+                    { id: 'webinarTopic', label: 'Thema', type: 'text', placeholder: 'z.B. Content-Planung ohne Chaos' }
+                ]
+            },
+            {
+                id: 'youtube-script',
+                name: 'YouTube Video Script',
+                category: 'content',
+                description: '5-15 Min',
+                inputs: [
+                    { id: 'ytTopic', label: 'Thema', type: 'text', placeholder: 'z.B. Mein Tool-Stack 2024' },
+                    { id: 'videoLength', label: 'Länge', type: 'select', options: ['5 Min', '10 Min', '15 Min'] }
+                ]
+            },
+            {
+                id: 'linkedin-article',
+                name: 'LinkedIn Artikel',
+                category: 'social',
+                description: '800-1500 Wörter',
+                inputs: [
+                    { id: 'articleTopic', label: 'Thema', type: 'text', placeholder: 'z.B. Die Zukunft von Content Marketing' }
+                ]
+            },
+            {
+                id: 'product-launch',
+                name: 'Product Launch Sequence',
+                category: 'social',
+                description: '7 Tage Launch-Content',
+                inputs: [
+                    { id: 'launchProduct', label: 'Produkt', type: 'text', placeholder: 'z.B. PromptEngine 2.0' }
+                ]
+            },
+            {
+                id: 'podcast-outline',
+                name: 'Podcast Episode Outline',
+                category: 'content',
+                description: 'Struktur + Talking Points',
+                inputs: [
+                    { id: 'episodeTopic', label: 'Episode-Thema', type: 'text', placeholder: 'z.B. Warum Personal Branding überbewertet ist' }
+                ]
+            },
+            {
+                id: 'faq',
+                name: 'FAQ Generator',
+                category: 'social',
+                description: '10-15 häufige Fragen',
+                inputs: [
+                    { id: 'faqProduct', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit' }
+                ]
+            },
+            {
+                id: 'pinterest-pins',
+                name: 'Pinterest Pin Descriptions',
+                category: 'social',
+                description: '10 Pin-Beschreibungen',
+                inputs: [
+                    { id: 'pinTopic', label: 'Thema/Nische', type: 'text', placeholder: 'z.B. Content-Planung' }
+                ]
             }
-            // ... 12 weitere Templates hier (gekürzt für Übersicht)
         ];
 
-        // ==========================================
-        // INIT
-        // ==========================================
+        let selectedTemplate = null;
+        let brandData = {};
+        let currentFilter = 'all';
+
         function init() {
             loadBrand();
-            loadAPIKey();
             renderTemplates();
-            updateAPIStatus();
         }
 
-        // ==========================================
-        // API KEY MANAGEMENT
-        // ==========================================
-        function loadAPIKey() {
-            apiKey = localStorage.getItem('smarthirn_api_key') || '';
-            updateAPIStatus();
-        }
-
-        function updateAPIStatus() {
-            const status = document.getElementById('apiKeyStatus');
-            const banner = document.getElementById('apiKeyBanner');
-            
-            if (apiKey) {
-                status.className = 'api-key-status connected';
-                status.textContent = '✅ Verbunden';
-                banner.className = 'api-key-banner success';
-                banner.innerHTML = `
-                    <div>
-                        <strong>✅ API-Key aktiv</strong>
-                        <p style="margin:0">AI-Features sind einsatzbereit</p>
-                    </div>
-                    <button onclick="openAPISetup()">⚙️ Verwalten</button>
-                `;
-            } else {
-                status.className = 'api-key-status disconnected';
-                status.textContent = '❌ Nicht verbunden';
-            }
-        }
-
-        function openAPISetup() {
-            document.getElementById('apiSetupModal').classList.remove('hidden');
-            document.getElementById('apiKeyInput').value = apiKey;
-        }
-
-        function closeAPISetup() {
-            document.getElementById('apiSetupModal').classList.add('hidden');
-        }
-
-        function saveAPIKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            
-            if (!key.startsWith('sk-')) {
-                showStatus('apiSetupStatus', 'error', '❌ Ungültiger Key. Muss mit "sk-" beginnen.');
-                return;
-            }
-            
-            apiKey = key;
-            localStorage.setItem('smarthirn_api_key', key);
-            updateAPIStatus();
-            showStatus('apiSetupStatus', 'success', '✅ API-Key gespeichert!');
-            
-            setTimeout(() => {
-                closeAPISetup();
-            }, 1500);
-        }
-
-        async function testAPIKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            
-            if (!key) {
-                showStatus('apiSetupStatus', 'error', '❌ Bitte Key eingeben');
-                return;
-            }
-            
-            showStatus('apiSetupStatus', 'info', '🧪 Teste Verbindung...');
-            
-            try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-api-key": key,
-                        "anthropic-version": "2023-06-01"
-                    },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514",
-                        max_tokens: 50,
-                        messages: [{ role: "user", content: "Test" }]
-                    })
-                });
-                
-                if (response.ok) {
-                    showStatus('apiSetupStatus', 'success', '✅ Verbindung erfolgreich! Key funktioniert.');
-                } else {
-                    const error = await response.json();
-                    showStatus('apiSetupStatus', 'error', `❌ Fehler: ${error.error?.message || 'Ungültiger Key'}`);
-                }
-            } catch (error) {
-                showStatus('apiSetupStatus', 'error', '❌ Verbindungsfehler. Key prüfen.');
-            }
-        }
-
-        // ==========================================
-        // TEMPLATES
-        // ==========================================
         function renderTemplates() {
             const grid = document.getElementById('templateGrid');
             const filtered = currentFilter === 'all' 
@@ -991,7 +721,6 @@
             renderTemplateInputs();
             document.getElementById('templateInputs').classList.remove('hidden');
             document.getElementById('output').classList.add('hidden');
-            document.getElementById('aiOutput').classList.add('hidden');
         }
 
         function renderTemplateInputs() {
@@ -1024,9 +753,6 @@
             }).join('');
         }
 
-        // ==========================================
-        // PROMPT GENERATION
-        // ==========================================
         function generatePrompt() {
             if (!selectedTemplate) return;
             
@@ -1039,7 +765,6 @@
             
             document.getElementById('resultBox').textContent = prompt;
             document.getElementById('output').classList.remove('hidden');
-            document.getElementById('aiOutput').classList.add('hidden');
             document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1047,7 +772,6 @@
             const brand = brandData;
             let prompt = '';
             
-            // Brand Context
             prompt += `Rolle: Du bist Content-Stratege.\n\n`;
             prompt += `Brand-Kontext:\n`;
             prompt += `- Marke: ${brand.name || '[Marke]'}\n`;
@@ -1059,174 +783,62 @@
             if (brand.noGos) prompt += `- No-Go-Wörter: ${brand.noGos}\n`;
             prompt += `\n`;
             
-            // Template-specific instructions
             prompt += getTemplatePrompt(templateId, data);
             
-            // Anti-Generic Rules
-            prompt += `\nAnti-Generic-Rules (ZWINGEND):\n`;
-            prompt += `1. Keine Buzzwords/Floskeln aus No-Go-Liste\n`;
-            prompt += `2. Konkrete Zahlen/Beispiele statt vage Claims\n`;
-            prompt += `3. Kurze Sätze (max 15 Wörter)\n`;
-            prompt += `4. Aktive Sprache, kein Passiv\n`;
-            prompt += `5. Spezifische CTAs (nicht nur "Was denkst du?")\n`;
-            prompt += `6. Brand Voice einhalten: ${brand.voice || 'direkt'}\n`;
-            prompt += `7. Persönliche Note (aus eigener Erfahrung)\n`;
+            prompt += `\n🚨 ANTI-GENERIC-RULES (ZWINGEND - BEI VERSTOẞ KOMPLETT NEU):\n\n`;
+            prompt += `1. VERBOTENE WÖRTER (nutze KEINS davon):\n`;
+            if (brand.noGos) {
+                prompt += `   - ${brand.noGos}\n`;
+            }
+            prompt += `   - "Game-Changer", "Transform", "Journey", "Entdecke"\n`;
+            prompt += `   - "Revolutionär", "Einzigartig", "Ultimativ"\n`;
+            prompt += `   - "Tauche ein", "Level up", "Next Level"\n\n`;
+            
+            prompt += `2. KONKRETE BEISPIELE PFLICHT:\n`;
+            prompt += `   - Keine vagen Aussagen ("viele Kunden", "oft")\n`;
+            prompt += `   - Stattdessen: Zahlen, Namen, spezifische Situationen\n`;
+            prompt += `   - Beispiel FALSCH: "Viele scheitern"\n`;
+            prompt += `   - Beispiel RICHTIG: "73% meiner Kunden in Q4 2025 scheiterten weil..."\n\n`;
+            
+            prompt += `3. SATZ-LÄNGE:\n`;
+            prompt += `   - Max 15 Wörter pro Satz (zähle nach!)\n`;
+            prompt += `   - Bei Überschreitung: Satz aufteilen\n\n`;
+            
+            prompt += `4. AKTIVE SPRACHE:\n`;
+            prompt += `   - Kein Passiv ("wurde gemacht")\n`;
+            prompt += `   - Stattdessen: Subjekt-Verb-Objekt\n\n`;
+            
+            prompt += `5. SPEZIFISCHE CTAs:\n`;
+            prompt += `   - VERBOTEN: "Was denkst du?", "Kennst du das?"\n`;
+            prompt += `   - STATTDESSEN: Frage die sich auf spezifischen Content bezieht\n\n`;
+            
+            prompt += `6. BRAND VOICE: ${brand.voice || 'direkt'}\n\n`;
+            
+            prompt += `7. PERSÖNLICHE NOTE:\n`;
+            prompt += `   - Mindestens 1 Ich-Perspektive\n`;
+            prompt += `   - Eigene Erfahrung (konkret!)\n\n`;
+            
+            prompt += `8. FINAL CHECK:\n`;
+            prompt += `   - Klingt es nach ${brand.name} oder nach jedem anderen?\n`;
+            prompt += `   - Wenn austauschbar: KOMPLETT NEU SCHREIBEN\n`;
             
             return prompt;
         }
 
         function getTemplatePrompt(id, data) {
             const prompts = {
-                'instagram-post': `Aufgabe:\nErstelle einen Instagram-Post über "${data.topic}".\n\nZiel: ${data.goal}\nCaption-Typ: ${data.captionType} (aus System-Kit Teil B)\n\nStruktur:\n- Hook (erste 2 Sätze - max 12 Wörter)\n- 3 Kernpunkte (je 1-2 Sätze)\n- CTA (spezifische Frage, keine generische)\n\nMax. 150 Wörter gesamt.\n`,
+                'instagram-post': `Aufgabe:\nErstelle einen Instagram-Post über "${data.topic}".\n\nZiel: ${data.goal}\nCaption-Typ: ${data.captionType}\n\n🚨 NUTZE DIESE DETAILS:\n- Story: ${data.personalExample}\n- Zahl: ${data.specificNumber}\n- Methode: ${data.uniqueMethod}\n\nStruktur:\n- Hook (max 12 Wörter) mit konkreter Zahl ODER Story\n- 3 Punkte: Story + Learning + Methode\n- CTA (keine generische Frage!)\n\n⚠️ VERBOTEN:\n- "4 Monate 3x pro Woche" (zu austauschbar)\n- "Das Ergebnis?" (cliché)\n- "Transformation", "Journey"\n\n✅ PFLICHT:\n- Nutze ${data.specificNumber}\n- Beziehe dich auf ${data.personalExample}\n- Erwähne ${data.uniqueMethod}\n- Schreibe wie ein Mensch, nicht Coach-Bot\n`,
                 
-                'linkedin-thought': `Aufgabe:\nErstelle einen LinkedIn Thought Leadership Post.\n\nThese: "${data.thesis}"\nBeweis/Daten: ${data.proof}\n\nStruktur:\n- Hook mit These (provokativ)\n- 3-4 Belege/Argumente mit Daten\n- Persönliche Perspektive (1-2 Sätze)\n- CTA zur Diskussion\n\nTonalität: Professionell aber meinungsstark\nMax. 300 Wörter.\n`,
+                'carousel': `Aufgabe:\nCarousel mit ${data.slides} Slides: "${data.carouselTopic}"\n\n🚨 NUTZE:\n- Dein Fehler: ${data.ownMistake}\n- Kunden-Fall: ${data.clientExample}\n\nSlide 1: Hook (provokativ, max 5 Wörter)\nSlide 2-${data.slides-1}: Mind. 1 Slide mit ${data.ownMistake}, mind. 1 mit ${data.clientExample}\nSlide ${data.slides}: CTA zur Conversion\n\nPro Slide: Überschrift + 2-3 Bullets + Icon-Vorschlag\n\n⚠️ VERBOTEN: Generische Tipps ohne konkrete Beispiele\n`,
                 
-                'hooks-generator': `Aufgabe:\nGeneriere 30 verschiedene Hooks zum Thema "${data.mainTopic}".\n\nAnsätze (je 3 Hooks):\n1. Controversial Take\n2. Data-Driven (mit Zahl)\n3. Personal Story (Ich-Perspektive)\n4. Question-First (provokante Frage)\n5. Myth-Busting ("Man sagt X, aber...")\n6. Before/After (Transformation)\n7. "Nobody talks about..."\n8. Reverse Psychology ("Hör auf mit X")\n9. Unpopular Opinion\n10. Contrast (Most vs Best)\n\nRegeln:\n- Max 12 Wörter pro Hook\n- Keine Emojis\n- Keine generischen Einstiege\n- Jeder Hook muss unique sein\n`,
+                'linkedin-thought': `LinkedIn Thought Leadership\n\nThese: "${data.thesis}"\nBeweis: ${data.proof}\n\nStruktur:\n- Hook mit These\n- 3-4 Argumente mit Daten\n- Perspektive\n- Diskussions-CTA\n\nMax 300 Wörter\n`,
                 
-                'carousel': `Aufgabe:\nErstelle ein Instagram Carousel mit ${data.slides} Slides zum Thema "${data.carouselTopic}".\n\nPro Slide:\n- Überschrift (max 5 Wörter, groß gedacht)\n- 2-3 Bullet Points (je 1 Satz)\n- Visueller Hinweis (Icon-Vorschlag oder Farbe)\n\nSlide-Struktur:\nSlide 1: Hook (Problem oder steile These)\nSlide 2-${data.slides-1}: Content (je 1 Hauptpunkt pro Slide)\nSlide ${data.slides}: CTA + Zusammenfassung\n\nWichtig:\n- Jeder Slide muss standalone verständlich sein\n- Keine Wiederholungen zwischen Slides\n- Klarer roter Faden\n`,
-                
-                'reel-script': `Aufgabe:\nSchreibe ein ${data.duration} Video-Script zum Thema "${data.videoTopic}".\n\nFormat:\n[0-3s] Hook (visuell beschreiben + Text-Overlay)\n[3-15s] Setup/Problem (zeigen, nicht nur erzählen)\n[15-${parseInt(data.duration)-10}s] Lösung/Content (3 konkrete Punkte)\n[${parseInt(data.duration)-10}s-${data.duration}] CTA + Abschluss\n\nWichtig:\n- Jede Sekunde zählt - kein Füllmaterial\n- Visuelle Anweisungen in [Klammern]\n- Text-Overlays separat markieren\n- B-Roll-Vorschläge wo sinnvoll\n`,
-                
-                'meta-ad': `Aufgabe:\nErstelle Meta Ad Copy für "${data.product}".\n\nAngebot: ${data.offer}\n\n2 Varianten:\n\nVariante A (Problem-fokussiert):\n- Headline (max 40 Zeichen)\n- Primary Text: Startet mit Problem, dann Lösung (125 Wörter)\n- CTA-Button (max 20 Zeichen)\n\nVariante B (Benefit-fokussiert):\n- Headline (max 40 Zeichen)\n- Primary Text: Startet mit Ergebnis, dann How (125 Wörter)\n- CTA-Button (max 20 Zeichen)\n\nBeide Varianten:\n- Social Proof einbauen (wenn möglich)\n- Dringlichkeit schaffen (ohne Bullshit)\n- Klar kommunizieren was passiert nach Klick\n`,
-                
-                'email-sequence': `Aufgabe:\nErstelle eine ${data.emailCount}-E-Mail-Sequenz für Freebie "${data.freebie}".\n\nE-Mail 1 (sofort nach Anmeldung):\n- Betreff: [Catchy, max 50 Zeichen]\n- Willkommen + Download-Link prominent\n- Kurze Vorstellung (wer bin ich, warum das wichtig ist)\n- PS mit Vorschau auf nächste E-Mail\nMax. 100 Wörter\n\nE-Mail 2 (3 Tage später):\n- Betreff: [Bezug zu E-Mail 1]\n- Zusätzlicher Tipp (über Freebie hinaus)\n- Kurze Story oder Beispiel\n- Frage zur Interaktion\nMax. 150 Wörter\n\nE-Mail 3 (7 Tage später):\n- Betreff: [Benefit-orientiert]\n- Zusammenfassung Wert geliefert\n- Soft-Pitch für nächsten Schritt\n- 2 Optionen: [Angebot] oder weiter kostenlos folgen\n- Kein Druck, ehrlich kommunizieren\nMax. 200 Wörter\n`,
-                
-                'landing-page': `Aufgabe:\nSchreibe Landing Page Copy für "${data.lpProduct}".\n\nHauptnutzen: ${data.mainBenefit}\n\nSections:\n\n1. Hero Section:\n- Headline (max 10 Wörter, benefit-driven)\n- Subheadline (max 20 Wörter, spezifiziert wer/was)\n- CTA-Button-Text\n\n2. Benefits (3 Stück):\n- Je 1 Überschrift + 2-3 Sätze Erklärung\n- Fokus auf Outcome, nicht Features\n\n3. Social Proof:\n- 1 starkes Testimonial (erfinden mit realistischen Details)\n- Zahlen/Stats wenn möglich\n\n4. Final CTA:\n- Headline (What happens next)\n- CTA-Button\n- Trust-Elemente (Geld-zurück, etc.)\n`,
-                
-                'twitter-thread': `Aufgabe:\nSchreibe einen Twitter/X Thread (8-12 Tweets) über "${data.threadTopic}".\n\nTweet 1 (Hook):\n- Starke Behauptung oder Frage\n- Muss scrollen stoppen\n- Max 280 Zeichen\n- Endet mit "🧵" oder "Thread:"\n\nTweet 2-10 (Content):\n- 1 Hauptpunkt pro Tweet\n- Jeder Tweet standalone lesbar\n- Nummerierung (1/10, 2/10, etc.)\n- Mix aus Fakten, Beispielen, Meinungen\n\nLetzter Tweet:\n- Zusammenfassung (1 Satz)\n- CTA (Follow, Like, Retweet)\n- Optional: Link zu Deep-Dive\n\nWichtig:\n- Jeder Tweet max 280 Zeichen\n- Keine Hashtags (außer 1-2 am Ende)\n- Klare Struktur, roter Faden\n`,
-                
-                'case-study': `Aufgabe:\nSchreibe eine Case Study.\n\nAusgangssituation: ${data.before}\nErgebnis: ${data.after}\n\nStruktur:\n\n1. Ausgangssituation (2-3 Sätze):\n- Konkrete Zahlen und Details\n- Hauptproblem benennen\n\n2. Prozess (3 konkrete Schritte):\n- Was genau wurde gemacht\n- Zeitrahmen angeben\n- Herausforderungen erwähnen\n\n3. Ergebnis (mit Zahlen):\n- Vorher/Nachher-Vergleich\n- Spezifische Metriken\n- Zeitraum angeben\n\n4. Lektion/Takeaway:\n- Was war der Game-Changer\n- Was würdest du anders machen\n- 1 konkreter Tipp für Leser\n\nGesamt: 300-400 Wörter\n`,
-                
-                'google-ads': `Aufgabe:\nErstelle Google Ads RSA (Responsive Search Ads) für Keyword "${data.keyword}".\n\n15 Headlines:\n- Max 30 Zeichen pro Headline\n- Keyword in mind. 8 Headlines einbauen\n- Mix aus: Benefit, Feature, Dringlichkeit, Frage, Zahlen\n- Variationen für verschiedene Positionen\n\n4 Descriptions:\n- Max 90 Zeichen pro Description\n- Keyword mindestens 2x verwenden\n- Klarer Call-to-Action\n- USPs hervorheben\n\nWichtig:\n- Headline 1-3 besonders stark (werden häufigsten angezeigt)\n- Keine Wiederholungen\n- Google kombiniert Headlines automatisch\n`,
-                
-                'cold-email': `Aufgabe:\nSchreibe Cold Outreach E-Mail an ${data.targetCompany}.\n\nProblem das du löst: ${data.painpoint}\n\nStruktur:\n\nBetreff:\n- Pattern Interrupt (keine generische "Zusammenarbeit")\n- Max 50 Zeichen\n- Neugier wecken\n\nE-Mail Body:\n1. Opening (1 Satz):\n- Persönlicher Bezug oder spezifische Beobachtung\n- KEIN "Ich hoffe es geht dir gut"\n\n2. Problem (2 Sätze):\n- Spezifisches Problem benennen\n- Zeigen dass du ihre Situation verstehst\n\n3. Solution Hint (1 Satz):\n- Kurz andeuten wie du hilfst\n- Noch KEIN Pitch\n\n4. CTA (1 Satz):\n- Low friction (15 Min Call, nicht "Demo buchen")\n- Konkrete Zeit vorschlagen\n\nGesamt: Max 100 Wörter\nTon: Direkt, nicht verkäuferisch\n`,
-                
-                'newsletter': `Aufgabe:\nErstelle Newsletter Template "${data.newsletterTheme}".\n\nAnzahl Sections: ${data.sections}\n\nStruktur:\n\nSubject Line:\n- Neugier wecken\n- Max 50 Zeichen\n- Benefit oder interessanter Teaser\n\nIntro (50 Wörter):\n- Persönliche Anrede\n- Was erwartet den Leser heute\n- Warum sollte er weiterlesen\n\nSections (je 100-150 Wörter):\nPro Section:\n- Überschrift (benefit-driven)\n- Kerninhalt (1-2 Absätze)\n- Optional: Link zu Deep-Dive\n\nP.S. (20 Wörter):\n- Persönliche Note\n- Soft-CTA oder Vorschau nächste Woche\n\nWichtig:\n- Scannable (kurze Absätze, Zwischenüberschriften)\n- Conversational tone\n- 1 klarer CTA pro Section max\n`,
-                
-                'testimonial-request': `Aufgabe:\nSchreibe Testimonial Request an ${data.customerName}.\n\nProdukt/Service: ${data.productUsed}\n\nBetreff:\n"Kurze Frage zu ${data.productUsed}"\n\nE-Mail:\n\n1. Appreciation (2 Sätze):\n- Danke für Nutzung/Trust\n- Spezifischer Bezug (nicht generisch)\n\n2. Request (1 Satz):\n- "Würdest du mir helfen mit einem kurzen Testimonial?"\n\n3. Spezifische Fragen (3 Stück):\n- Was war deine Situation vorher?\n- Was hat sich durch [Produkt] verändert?\n- Was würdest du anderen sagen die überlegen?\n\n4. Make it easy:\n- "Du kannst auch einfach auf diese E-Mail antworten"\n- Optional: Link zu Google Form\n\nTon: Appreciative, nicht pushy\nMax. 150 Wörter\n`,
-                
-                'sales-page': `Aufgabe:\nSchreibe Sales Page für "${data.salesProduct}".\n\nHaupteinwände: ${data.objections}\n\nSections:\n\n1. Above the Fold:\n- Headline (max 12 Wörter, outcome-focused)\n- Subheadline (wer ist es für, was bekommen sie)\n- Hero CTA\n\n2. Problem (Agitate):\n- 3 spezifische Schmerzpunkte\n- Reader muss sich erkannt fühlen\n\n3. Solution (Product Introduction):\n- Was ist es (kurz)\n- Warum anders als andere Lösungen\n\n4. How it Works:\n- 3-4 Schritte\n- Einfach erklären\n\n5. Benefits (nicht Features):\n- 5 Hauptbenefits\n- Je mit Icon/Visual-Vorschlag\n- Outcome-fokussiert\n\n6. Objection Handling:\n- Direkt auf Einwände eingehen: ${data.objections}\n- Pro Einwand: 2-3 Sätze Antwort\n\n7. Testimonials:\n- 3 erfundene aber realistische Testimonials\n- Mit Namen, Rolle, spezifischem Outcome\n\n8. Guarantee:\n- Geld-zurück oder anderes\n- Risiko umkehren\n\n9. Final CTA:\n- Was passiert nach Kauf\n- Price (wenn gegeben)\n- Dringlichkeit (ohne Bullshit)\n\nTon: Conversational, confident, nicht pushy\n`,
-                
-                'webinar-script': `Aufgabe:\nSchreibe Webinar Script "${data.webinarTopic}" (${data.duration}).\n\nStruktur:\n\n1. Hook + Intro (5 Min):\n- Starke Eröffnung (Zahl, Story, Frage)\n- Wer bin ich (kurz, Credibility)\n- Was lernst du heute\n- Erwartungen setzen\n\n2. Problem Agitation (10 Min):\n- 3 Hauptprobleme in der Nische\n- Warum bisherige Lösungen nicht funktionieren\n- Kosten des Nichtstuns\n\n3. Framework/Lösung (20-30 Min):\n- Dein Framework vorstellen (3-5 Schritte)\n- Pro Schritt: Was, Warum, Wie\n- 1-2 konkrete Beispiele\n- 1 Quick Win zum Mitnehmen\n\n4. Q&A Setup (5 Min):\n- "Stelle Fragen im Chat"\n- Währenddessen: Pitch vorbereiten\n\n5. CTA/Offer (5-10 Min):\n- Was ist der nächste Schritt\n- Angebot vorstellen (falls relevant)\n- Bonus für Webinar-Teilnehmer\n- Dringlichkeit (Limited Spots/Time)\n\nSlide-Vorschläge:\n- Pro Section 3-5 Slides\n- Mehr Visuals, weniger Text\n- Screenshots/Beispiele wo möglich\n\nWichtig:\n- Engagement-Fragen alle 7-10 Min\n- Stories einbauen (nicht nur Theorie)\n- Praktisch > Theoretisch\n`,
-                
-                'youtube-script': `Aufgabe:\nSchreibe YouTube Script "${data.ytTopic}" (${data.videoLength}).\n\nFormat: ${data.format}\n\nStruktur:\n\n[0:00-0:15] Hook:\n- Erste 3 Sekunden: Visuell auffällig\n- Pattern Interrupt\n- Verspreche klares Outcome\n\n[0:15-1:00] Intro:\n- Wer bin ich (kurz)\n- Was lernst du heute (3 Punkte)\n- Warum solltest du bleiben\n\n[1:00-${parseInt(data.videoLength)-2}:00] Main Content:\n- In Kapitel/Sections aufteilen\n- Pro Minute 1 Hauptpunkt\n- Visuelles für jeden Punkt vorschlagen\n- B-Roll-Ideen in [Klammern]\n\n[${parseInt(data.videoLength)-2}:00-${data.videoLength}:00] Outro:\n- Kurze Zusammenfassung (3 Punkte)\n- CTA (Subscribe, anderes Video, Link)\n- End Screen Vorschlag\n\nProduction Notes:\n- Cuts alle 3-5 Sekunden (Pacing)\n- Text-Overlays für Key Points\n- Music-Suggestion für Intro/Outro\n\nWichtig:\n- Retention-driven (Hook every 30s)\n- Conversational, nicht scripted klingen\n- Personality zeigen\n`,
-                
-                'linkedin-article': `Aufgabe:\nSchreibe LinkedIn Artikel "${data.articleTopic}".\n\nAngle: ${data.angle}\n\n800-1500 Wörter\n\nStruktur:\n\n1. Hook Paragraph (3-4 Sätze):\n- Starke Eröffnung (Story, Zahl, steile These)\n- Muss scrollen stoppen\n- Kläre worum es geht\n\n2. Main Body (3-5 Sections):\nPro Section:\n- Subheadline (H2)\n- 2-3 Absätze\n- Konkretes Beispiel oder Daten\n- Zwischenüberschriften für Scanability\n\n3. Conclusion (2-3 Absätze):\n- Zusammenfassung Key Points\n- Bigger Picture / Warum wichtig\n- Call to Action (Comment, Share, Connect)\n\nFormatierung:\n- Kurze Absätze (2-3 Sätze max)\n- Bullet Points wo sinnvoll\n- Keine Emojis (professionell bleiben)\n- Bold für Key Phrases\n\nTon: ${data.angle === 'Persönliche Meinung' ? 'Personal aber professionell' : 'Authoritative, datengetrieben'}\n\nWichtig:\n- Erste 3 Zeilen entscheiden über Weiterlesen\n- Nicht wie Blog-Post (LinkedIn-specific tone)\n- Kontroverse ist ok (bringt Engagement)\n`,
-                
-                'product-launch': `Aufgabe:\nErstelle 7-Tage Launch Sequence für "${data.launchProduct}".\n\nLaunch-Datum: ${data.launchDate}\n\nTag -3 (Teaser):\n- Hook: "Something big coming..."\n- Problem hint ohne Lösung zu verraten\n- "Stay tuned" CTA\nFormat: Kurzer Post, max 100 Wörter\n\nTag -2 (Behind the Scenes):\n- Warum habe ich das erstellt\n- Welches Problem löst es\n- Erste Details (ohne Preis)\nFormat: Story-Post, 150 Wörter\n\nTag -1 (Sneak Peek):\n- Feature-Vorschau\n- Screenshot oder Demo-Video-Idee\n- "Morgen geht's los"\nFormat: Visual-heavy Post\n\nTag 0 (Launch):\n- "Es ist da!"\n- Was ist es, für wen, Preis\n- Early Bird Angebot (24h)\n- Klarer CTA mit Link\nFormat: Announcement Post, 200 Wörter\n\nTag +1 (Social Proof):\n- Erste Testimonials/Screenshots\n- "X Leute haben schon..."\n- Reminder: Early Bird läuft aus\nFormat: Proof-focused\n\nTag +2 (Objection Handling):\n- "Häufigste Fragen beantwortet"\n- 3-5 FAQs adressieren\n- "Noch Y Stunden Early Bird"\nFormat: Educational Post\n\nTag +3 (Last Call):\n- "Letzte Chance für [Bonus/Discount]"\n- Zusammenfassung was sie bekommen\n- Deadline klar kommunizieren\nFormat: Urgency-Post, 150 Wörter\n\nWichtig:\n- Konsistente Story über alle Posts\n- Nicht zu pushy\n- Value auch in Launch-Posts liefern\n`,
-                
-                'podcast-outline': `Aufgabe:\nErstelle Podcast Outline "${data.episodeTopic}" (${data.episodeLength}).\n\nStruktur:\n\n[0:00-2:00] Intro:\n- Hook (interessanteste Punkt aus Episode)\n- Episode-Titel + Nummer\n- Kurze Vorschau was kommt\n- Sponsor-Mention (falls relevant)\n\nMain Content Segments:\n\nSegment 1: Problem/Context (15% der Zeit):\n- Warum ist dieses Thema relevant\n- Persönlicher Bezug\n- Was werden wir erkunden\nTalking Points:\n- [3-5 Bullet Points]\n\nSegment 2: Deep Dive (50% der Zeit):\n- Hauptinhalt\n- 3-4 Unter-Themen\n- Stories/Beispiele einbauen\nTalking Points pro Sub-Topic:\n- [3-4 Bullets je]\n\nSegment 3: Takeaways (20% der Zeit):\n- Was haben wir gelernt\n- 3 konkrete Takeaways\n- Wie anwenden\nTalking Points:\n- [3 klare Takeaways]\n\nSegment 4: Outro (15% der Zeit):\n- Zusammenfassung\n- Teaser nächste Episode\n- CTA (Review, Subscribe, Connect)\n\nProduction Notes:\n- Music Cues (Intro/Outro/Transitions)\n- Editing-Hinweise\n- Mögliche Sponsoren-Integrationen\n\nWichtig:\n- Conversational, nicht scripted\n- Pausen für Atmung einplanen\n- Controversial nehmen ist ok (macht spannend)\n`,
-                
-                'faq': `Aufgabe:\nGeneriere ${data.faqCount} FAQs für "${data.faqProduct}".\n\nKategorien:\n1. Pre-Purchase (Vor dem Kauf)\n2. Technical (Wie funktioniert es)\n3. Support (Nach dem Kauf)\n4. Pricing (Kosten/Wert)\n\nPro Kategorie mind. 2 FAQs.\n\nFormat pro FAQ:\n\nFrage:\n- Wie User wirklich fragt (conversational)\n- Spezifisch, nicht zu breit\n\nAntwort:\n- Kurz und klar (max 100 Wörter)\n- Bullet Points wenn sinnvoll\n- Link zu Deep-Dive falls nötig\n- Objection handling einbauen\n\nBeispiel-Themen:\n- "Wie unterscheidet sich X von Y?"\n- "Brauche ich technische Kenntnisse?"\n- "Was passiert nach dem Kauf?"\n- "Gibt es Geld-zurück-Garantie?"\n- "Für wen ist es NICHT geeignet?"\n- "Wie lange dauert Setup?"\n- "Kann ich upgraden/downgraden?"\n\nWichtig:\n- Echte Fragen (nicht Marketing-Speak)\n- Ehrliche Antworten (auch Limitationen erwähnen)\n- SEO-relevant (wie Leute suchen)\n`,
-                
-                'pinterest-pins': `Aufgabe:\nGeneriere ${data.pinCount} Pinterest Pin Descriptions für "${data.pinTopic}".\n\nPro Pin:\n\n1. Title (60 Zeichen):\n- Keyword am Anfang\n- Benefit-driven\n- Clickworthy\n\n2. Description (max 500 Zeichen):\n- Erste 50-60 Zeichen wichtig (Vorschau)\n- 3-4 Keywords natürlich einbauen\n- Was learnt/bekommt der User\n- CTA am Ende\n- 3-5 Hashtags (#relevant #keywords)\n\n3. Board-Vorschlag:\n- In welches Board würde das passen\n\n4. Visual-Vorschlag:\n- Text-Overlay Idee\n- Farb-Schema\n- Stil (minimal, bold, etc.)\n\nKeyword-Strategie:\n- Haupt-Keyword: ${data.pinTopic}\n- Variationen einbauen\n- Long-tail Keywords für Nische\n\nBeispiel-Struktur:\nTitle: "[Keyword] - [Benefit]"\nDescription: "[Hook] [Value Prop] [CTA] [Hashtags]"\n\nWichtig:\n- Pinterest ist Suchmaschine (SEO wichtig)\n- User suchen nach Lösungen\n- Mehrwert kommunizieren, nicht nur clickbait\n`
+                'hooks-generator': `30 Hook-Varianten für "${data.mainTopic}"\n\nAnsätze (je 3):\n1. Controversial\n2. Data-Driven\n3. Personal Story\n4. Question-First\n5. Myth-Busting\n6. Before/After\n7. "Nobody talks about..."\n8. Reverse Psychology\n9. Unpopular Opinion\n10. Contrast\n\nMax 12 Wörter pro Hook\nKeine Emojis\n`
             };
             
-            return prompts[id] || `Aufgabe:\nErstelle Content für Template "${id}".\n\nParameter:\n${JSON.stringify(data, null, 2)}\n`;
+            return prompts[id] || `Aufgabe:\nErstelle Content für "${id}".\n\nNutze Brand-Infos oben.\n`;
         }
 
-        // ==========================================
-        // AI GENERATION
-        // ==========================================
-        async function generateWithAI() {
-            if (!apiKey) {
-                alert('Bitte erst API-Key einrichten!');
-                openAPISetup();
-                return;
-            }
-            
-            const prompt = document.getElementById('resultBox').textContent;
-            if (!prompt) {
-                alert('Erst Prompt generieren!');
-                return;
-            }
-            
-            document.getElementById('aiOutput').classList.remove('hidden');
-            document.getElementById('aiResultBox').innerHTML = '<div class="loading"><div class="spinner"></div>Generiere Content mit Claude...</div>';
-            
-            try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-api-key": apiKey,
-                        "anthropic-version": "2023-06-01"
-                    },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514",
-                        max_tokens: 2000,
-                        messages: [{ role: "user", content: prompt }]
-                    })
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'API Fehler');
-                }
-                
-                const data = await response.json();
-                const content = data.content?.[0]?.text || 'Fehler bei der Generierung';
-                
-                document.getElementById('aiResultBox').innerHTML = `<pre>${content}</pre>`;
-            } catch (error) {
-                document.getElementById('aiResultBox').innerHTML = `<div class="status error">❌ Fehler: ${error.message}<br><br>Prüfe deinen API-Key oder versuche es erneut.</div>`;
-            }
-            
-            document.getElementById('aiOutput').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        async function generateAIContent() {
-            if (!apiKey) {
-                alert('Bitte erst API-Key einrichten!');
-                openAPISetup();
-                return;
-            }
-            
-            const goal = document.getElementById('aiGoal').value;
-            if (!goal) return;
-            
-            const brand = brandData;
-            const prompt = `Rolle: Content-Stratege\n\nBrand: ${brand.name}\nZielgruppe: ${brand.audience}\nVoice: ${brand.voice}\n\nAufgabe:\n${goal}\n\nAnti-Generic-Rules:\n- Keine Buzzwords\n- Konkrete Beispiele\n- ${brand.voice} Tonalität\n`;
-            
-            document.getElementById('aiCustomOutput').classList.remove('hidden');
-            document.getElementById('aiCustomResultBox').innerHTML = '<div class="loading"><div class="spinner"></div>Erstelle Content...</div>';
-            
-            try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-api-key": apiKey,
-                        "anthropic-version": "2023-06-01"
-                    },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-20250514",
-                        max_tokens: 2000,
-                        messages: [{ role: "user", content: prompt }]
-                    })
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'API Fehler');
-                }
-                
-                const data = await response.json();
-                const content = data.content?.[0]?.text || 'Fehler';
-                
-                document.getElementById('aiCustomResultBox').innerHTML = `<pre>${content}</pre>`;
-            } catch (error) {
-                document.getElementById('aiCustomResultBox').innerHTML = `<div class="status error">❌ ${error.message}</div>`;
-            }
-        }
-
-        function regenerate() {
-            generateAIContent();
-        }
-
-        // ==========================================
-        // BRAND MANAGEMENT
-        // ==========================================
         function saveBrand() {
             brandData = {
                 name: document.getElementById('brandName').value,
@@ -1266,23 +878,6 @@
             a.click();
         }
 
-        // ==========================================
-        // UI HELPERS
-        // ==========================================
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.getElementById('templatesTab').classList.add('hidden');
-            document.getElementById('aiTab').classList.add('hidden');
-            
-            if (tab === 'templates') {
-                document.getElementById('templatesTab').classList.remove('hidden');
-            } else {
-                document.getElementById('aiTab').classList.remove('hidden');
-            }
-        }
-
         function showStatus(elementId, type, message) {
             const el = document.getElementById(elementId);
             el.className = `status ${type}`;
@@ -1295,26 +890,9 @@
             const text = document.getElementById('resultBox').textContent;
             navigator.clipboard.writeText(text);
             event.target.textContent = '✅ Kopiert!';
-            setTimeout(() => event.target.textContent = '📋 Kopieren', 2000);
+            setTimeout(() => event.target.textContent = '📋 Prompt kopieren', 2000);
         }
 
-        function copyAI() {
-            const text = document.getElementById('aiResultBox').textContent;
-            navigator.clipboard.writeText(text);
-            event.target.textContent = '✅ Kopiert!';
-            setTimeout(() => event.target.textContent = '📋 Kopieren', 2000);
-        }
-
-        function copyAICustom() {
-            const text = document.getElementById('aiCustomResultBox').textContent;
-            navigator.clipboard.writeText(text);
-            event.target.textContent = '✅ Kopiert!';
-            setTimeout(() => event.target.textContent = '📋 Kopieren', 2000);
-        }
-
-        // ==========================================
-        // INIT
-        // ==========================================
         init();
     </script>
 </body>
