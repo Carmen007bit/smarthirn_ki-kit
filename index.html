@@ -501,9 +501,13 @@
                 category: 'social',
                 description: 'Meinungspost',
                 inputs: [
-                    { id: 'thesis', label: 'Deine These/Behauptung', type: 'text', placeholder: 'z.B. Die meisten Startups skalieren zu früh | Designer müssen coden lernen | AI ersetzt keine Strategie' },
-                    { id: 'proof', label: 'Beweis/Daten/Beispiel', type: 'text', placeholder: 'z.B. 73% der Startups sterben beim Scaling | Mein letztes Projekt: +40% durch Code-Verständnis' },
-                    { id: 'personalXP', label: 'Deine persönliche Erfahrung', type: 'text', placeholder: 'z.B. Ich hab $50k verbrannt | Ich hab 2 Jahre gebraucht um das zu checken | Gestern mit CEO gesprochen' }
+                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Warum die meisten zu spät launchen' },
+                    { id: 'goal', label: 'Ziel', type: 'select', options: ['Awareness', 'Engagement', 'Conversion'] },
+                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Startup TaskFlow | Mein letzter Launch | Redesign-Projekt' },
+                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. 6 Monate gebaut, 0 Validation | Bounce Rate 78% | 0 User' },
+                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 12 Sales in Monat 1 | Bounce -55% | 1.2k User in 30 Tagen' },
+                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. Pre-Launch mit Waitlist | 47 A/B-Tests | Reddit statt Ads' },
+                    { id: 'insight', label: 'Kernproblem oder Erkenntnis', type: 'text', placeholder: 'z.B. Die meisten bauen zu lang | Design ≠ Conversion | Validation > Perfection' }
                 ]
             },
             {
@@ -512,7 +516,9 @@
                 category: 'content',
                 description: 'Verschiedene Ansätze',
                 inputs: [
-                    { id: 'mainTopic', label: 'Hauptthema', type: 'text', placeholder: 'z.B. E-Mail Marketing' }
+                    { id: 'mainTopic', label: 'Hauptthema', type: 'text', placeholder: 'z.B. Product Launches | SEO für SaaS | Design-Prozess' },
+                    { id: 'bestExample', label: 'Dein stärkstes Beispiel (kurz)', type: 'text', placeholder: 'z.B. 0 → $10k MRR | Bounce -70% | 10k Follower in 3 Monaten' },
+                    { id: 'surprisingNumber', label: 'Überraschende Zahl/Fakt', type: 'text', placeholder: 'z.B. 87% scheitern | $50k verbrannt | 6 Monate = 0 Sales' }
                 ]
             },
             {
@@ -521,8 +527,13 @@
                 category: 'social',
                 description: '30-60 Sekunden',
                 inputs: [
-                    { id: 'videoTopic', label: 'Thema', type: 'text', placeholder: 'z.B. Meine Morgenroutine' },
-                    { id: 'duration', label: 'Dauer', type: 'select', options: ['30s', '45s', '60s'] }
+                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Wie ich mein erstes $1k verdient habe' },
+                    { id: 'duration', label: 'Dauer', type: 'select', options: ['30s', '45s', '60s'] },
+                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Mein erstes Produkt | Client-Projekt | Mein Tool' },
+                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. $0 Revenue, keine Audience | Client Brief unclear' },
+                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. $1.2k in 2 Wochen | +40% Conversions | 500 Signups' },
+                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. Twitter-DMs statt Ads | 23 A/B-Tests | 48h MVP' },
+                    { id: 'visualHook', label: 'Visueller Hook (erste 3 Sek)', type: 'text', placeholder: 'z.B. Zeige Laptop mit $0 → $1.2k | Vorher/Nachher Screenshot' }
                 ]
             },
             {
@@ -531,8 +542,11 @@
                 category: 'ads',
                 description: 'Facebook/Instagram Ads',
                 inputs: [
-                    { id: 'product', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit' },
-                    { id: 'offer', label: 'Angebot', type: 'text', placeholder: 'z.B. Jetzt für 49€' }
+                    { id: 'product', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit | SEO-Audit | Design-Template | Fitness-Coaching' },
+                    { id: 'targetAudience', label: 'Zielgruppe (spezifisch)', type: 'text', placeholder: 'z.B. Solopreneure mit 1-3 Jahren Erfahrung | SaaS-Gründer pre-PMF | Designer 25-35' },
+                    { id: 'mainProblem', label: 'Hauptproblem der Zielgruppe', type: 'text', placeholder: 'z.B. Content-Chaos | Keine organischen Leads | Kein Design-System' },
+                    { id: 'offer', label: 'Angebot/CTA', type: 'text', placeholder: 'z.B. Jetzt für 49€ | Gratis Audit | 7-Tage Trial' },
+                    { id: 'biggestObjection', label: 'Größter Einwand', type: 'text', placeholder: 'z.B. Keine Zeit | Zu teuer | Funktioniert das wirklich?' }
                 ]
             },
             {
@@ -550,8 +564,11 @@
                 category: 'email',
                 description: '3-5 E-Mails',
                 inputs: [
-                    { id: 'freebie', label: 'Freebie-Name', type: 'text', placeholder: 'z.B. Content-Plan Template' },
-                    { id: 'emailCount', label: 'Anzahl E-Mails', type: 'number', value: '3' }
+                    { id: 'freebie', label: 'Freebie/Lead Magnet', type: 'text', placeholder: 'z.B. Content-Plan Template | SEO-Checklist | Design-System' },
+                    { id: 'emailCount', label: 'Anzahl E-Mails', type: 'number', value: '3' },
+                    { id: 'mainOffer', label: 'Haupt-Angebot (Paid Product)', type: 'text', placeholder: 'z.B. System-Kit für 49€ | Coaching für 299€ | Template Bundle' },
+                    { id: 'targetAudience', label: 'Zielgruppe', type: 'text', placeholder: 'z.B. Solopreneure | SaaS-Gründer | Freelance Designer' },
+                    { id: 'biggestObjection', label: 'Größter Einwand gegen Kauf', type: 'text', placeholder: 'z.B. Keine Zeit | Zu teuer | Brauche ich das wirklich?' }
                 ]
             },
             {
@@ -588,8 +605,11 @@
                 category: 'content',
                 description: 'Hero, Benefits, CTA',
                 inputs: [
-                    { id: 'lpProduct', label: 'Produkt', type: 'text', placeholder: 'z.B. System-Kit' },
-                    { id: 'mainBenefit', label: 'Hauptnutzen', type: 'text', placeholder: 'z.B. Content in 60 Min planen' }
+                    { id: 'lpProduct', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit | SEO-Coaching | Template Bundle' },
+                    { id: 'mainBenefit', label: 'Hauptnutzen (Outcome)', type: 'text', placeholder: 'z.B. Content in 60 Min planen | Organische Leads ohne Ads | Design in halber Zeit' },
+                    { id: 'price', label: 'Preis', type: 'text', placeholder: 'z.B. 49€ einmalig | 99€/Monat | 299€ Lifetime' },
+                    { id: 'topObjections', label: 'Top 3 Einwände (kommagetrennt)', type: 'text', placeholder: 'z.B. Keine Zeit, Zu teuer, Funktioniert das?' },
+                    { id: 'targetAudience', label: 'Zielgruppe', type: 'text', placeholder: 'z.B. Solopreneure 1-3 Jahre | SaaS-Gründer pre-PMF' }
                 ]
             },
             {
@@ -598,7 +618,12 @@
                 category: 'social',
                 description: '8-15 Tweets',
                 inputs: [
-                    { id: 'threadTopic', label: 'Thema', type: 'text', placeholder: 'z.B. Warum ich 3x/Woche poste' }
+                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Wie ich von 0 auf 10k Follower kam' },
+                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Mein Twitter-Growth | Launch von Produkt X | SEO-Case' },
+                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. 200 Follower, 0 Engagement | 0 Sales | Ranking Seite 7' },
+                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 10k Follower in 4 Monaten | $12k Sales | Position 1' },
+                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. 1 Thread/Tag + Engagement | Pre-Launch Waitlist | Cluster-Content' },
+                    { id: 'insight', label: 'Kernproblem oder Erkenntnis', type: 'text', placeholder: 'z.B. Consistency > Virality | Validation > Building | Intent > Keywords' }
                 ]
             },
             {
@@ -607,10 +632,13 @@
                 category: 'content',
                 description: 'Vorher/Nachher',
                 inputs: [
-                    { id: 'before', label: 'Vorher', type: 'text', placeholder: 'z.B. 60h/Woche, 3.200€' },
-                    { id: 'after', label: 'Nachher', type: 'text', placeholder: 'z.B. 30h/Woche, 7.500€' }
+                    { id: 'projectName', label: 'Projekt/Kunde/Name', type: 'text', placeholder: 'z.B. Startup TaskFlow | Redesign für E-Commerce | Kunde Sarah, 32' },
+                    { id: 'before', label: 'Vorher-Situation (mit Zahlen)', type: 'text', placeholder: 'z.B. 0 Leads, Bounce 78% | 200 Follower, 0 Sales | 95kg, keine Kondition' },
+                    { id: 'after', label: 'Nachher-Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 340 Leads/Monat, Bounce 23% | 10k Follower, $12k Sales | 79kg, 5km in 28 Min' },
+                    { id: 'method', label: 'Deine Methode/Was du gemacht hast', type: 'text', placeholder: 'z.B. SEO-Cluster + Reddit | 1 Thread/Tag + DMs | 3x20 Min Training' },
+                    { id: 'timeframe', label: 'Zeitraum', type: 'text', placeholder: 'z.B. 4 Monate | 90 Tage | 6 Monate' }
                 ]
-            },
+            },,
             {
                 id: 'sales-page',
                 name: 'Sales Page',
@@ -834,9 +862,11 @@
                 
                 'carousel': `Aufgabe:\nCarousel mit ${data.slides} Slides zum Thema "${data.carouselTopic}".\n\n🎯 DEINE DETAILS:\n- Dein Beispiel: ${data.ownExample}\n- Konkreter Fall: ${data.specificCase}\n\n✅ BEISPIELE GUTER CAROUSELS:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 MARKETING:\nThema: "5 Launch-Fehler die mich 10k gekostet haben"\n\nSlide 1: "Du machst Fehler #3" [Hook]\nSlide 2: "Zu spät gelauncht" - 6 Monate perfektioniert, 0 Sales\nSlide 3: "Kein Pre-Launch" - 0 Waitlist = 0 Day-1-Sales\nSlide 4: "Falsches Pricing" - $99 zu teuer, $29 zu billig\nSlide 5: "Keine Urgency" - Kein Reason to buy NOW\nSlide 6: "Follow-up vergessen" - 70% brauchen 3+ Touches\nSlide 7: "Nächstes Mal?" + CTA\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💻 SAAS:\nThema: "7 Dinge die ich vor meinem ersten $1k MRR gelernt habe"\n\nSlide 1: "$0 → $1.200 MRR in 4 Monaten"\nSlide 2: "Build in Public" - 300 Follower → 1.2k in 3 Monaten\nSlide 3: "Pricing 3x erhöht" - $9 → $29, gleiche Conversion\nSlide 4-7: Weitere Learnings mit Zahlen\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\nSlide 1 (Hook):\n- Überschrift: Max 5 Wörter, provokativ\n- NICHT: "${data.carouselTopic}" (zu langweilig)\n- BESSER: "Du machst Fehler #X" oder konkretes Ergebnis\n- Teaser auf kommende Slides\n\nSlide 2-${data.slides-1} (Content):\n- Pro Slide: 1 Hauptpunkt\n- Überschrift (5 Wörter max)\n- 2-3 Bullets (je max 15 Wörter)\n- PFLICHT: Mind. 1 Slide mit ${data.ownExample}\n- PFLICHT: Mind. 1 Slide mit ${data.specificCase}\n- Konkrete Zahlen wo möglich\n\nSlide ${data.slides} (CTA):\n- Kurze Zusammenfassung (1 Satz)\n- CTA: NICHT "Save this"\n- BESSER: "Welcher Fehler war bei dir?" oder "Schreib mir für X"\n\nPro Slide:\n- Icon/Emoji-Vorschlag\n- Farb-Suggestion (wenn relevant)\n\n⚠️ VERBOTEN:\n- Generische Tipps ohne Zahlen\n- "Die meisten Menschen..."\n- "Hier sind X Dinge..."\n`,
                 
-                'linkedin-thought': `LinkedIn Thought Leadership\n\nThese: "${data.thesis}"\nBeweis: ${data.proof}\n\nStruktur:\n- Hook mit These\n- 3-4 Argumente mit Daten\n- Perspektive\n- Diskussions-CTA\n\nMax 300 Wörter\n`,
+                'linkedin-thought': `Aufgabe:\nErstelle einen LinkedIn Post über "${data.topic}".\n\nZiel: ${data.goal}\n\n🎯 DEINE DETAILS:\n- Beispiel/Fall: ${data.example}\n- Ausgangssituation: ${data.startSituation}\n- Ergebnis: ${data.result}\n- Methode: ${data.method}\n- Erkenntnis: ${data.insight}\n\n✅ LINKEDIN-FORMAT (Professional aber meinungsstark):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBEISPIEL MARKETING:\n\n"Die meisten launchen zu spät.\n\nMein letzter Product-Launch: 6 Monate Entwicklung. Perfect Product. 12 Sales in Monat 1.\n\nHeute: 48h MVP. Broken UI. 400 Beta-User vor Launch.\n\nDer Unterschied? Ich verkaufe BEVOR ich baue.\n250 Waitlist → dann erst Code.\n\nValidation > Perfection.\n\nLaunchst du oder perfektionierst du?"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 STRUKTUR:\n\n1. HOOK (1-2 Sätze):\n   - Steile These aus ${data.insight}\n   - Provokativ, meinungsstark\n   - NICHT "Ich möchte etwas teilen"\n\n2. DEINE STORY (3-4 Absätze):\n   - ${data.example}: ${data.startSituation}\n   - Was lief schief / Was hast du gelernt\n   - ${data.method} - wie du es gelöst hast\n   - ${data.result} mit Zahlen\n\n3. LEARNING (1-2 Sätze):\n   - ${data.insight} ausformulieren\n   - Ohne Bullshit\n\n4. CTA:\n   - Frage die Diskussion startet\n   - NICHT "Thoughts?"\n   - Bezug auf ${data.insight}\n\nMAX 300 Wörter.\n\n⚠️ LINKEDIN-REGELN:\n- Keine Emojis (professional bleiben)\n- Kurze Absätze (2-3 Zeilen max)\n- Keine Hashtags im Text (max 3 am Ende)\n- Erste 2 Zeilen = Hook (entscheiden über "Mehr anzeigen")\n`,
                 
-                'hooks-generator': `30 Hook-Varianten für "${data.mainTopic}"\n\nAnsätze (je 3):\n1. Controversial\n2. Data-Driven\n3. Personal Story\n4. Question-First\n5. Myth-Busting\n6. Before/After\n7. "Nobody talks about..."\n8. Reverse Psychology\n9. Unpopular Opinion\n10. Contrast\n\nMax 12 Wörter pro Hook\nKeine Emojis\n`
+                'hooks-generator': `30 Hook-Varianten für "${data.mainTopic}"\n\nDein Beispiel: ${data.bestExample}\nÜberraschende Zahl: ${data.surprisingNumber}\n\nAnsätze (je 3 Hooks):\n\n1. CONTROVERSIAL TAKE:\n- Nutze ${data.surprisingNumber}\n- Beispiel: "${data.surprisingNumber} - und niemand spricht darüber"\n\n2. DATA-DRIVEN:\n- Starte mit Zahl\n- Beispiel: "${data.surprisingNumber}"\n\n3. PERSONAL STORY:\n- Nutze ${data.bestExample}\n- Ich-Perspektive\n\n4. QUESTION-FIRST:\n- Provokante Frage\n- Bezug auf ${data.mainTopic}\n\n5. MYTH-BUSTING:\n- "Man sagt X, aber..."\n\n6. BEFORE/AFTER:\n- ${data.bestExample} als Transformation\n\n7. "NOBODY TALKS ABOUT...":\n- Contrarian\n\n8. REVERSE PSYCHOLOGY:\n- "Hör auf mit X"\n\n9. UNPOPULAR OPINION:\n- "Unpopular: ${data.mainTopic}"\n\n10. CONTRAST:\n- "Most vs Best"\n\nMAX 12 Wörter pro Hook.\nKeine Emojis.\nJeder Hook unique.\n`,
+                
+                'email-sequence': `Aufgabe:\nErstelle ${data.emailCount}-E-Mail-Sequenz für Lead Magnet "${data.freebie}".\n\n🎯 DEINE DETAILS:\n- Freebie: ${data.freebie}\n- Haupt-Angebot: ${data.mainOffer}\n- Zielgruppe: ${data.targetAudience}\n- Größter Einwand: ${data.biggestObjection}\n\n✅ BEISPIEL SEQUENZ (3 E-Mails):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 E-MAIL 1 (Sofort nach Opt-In):\n\nBetreff: "Dein Content-Plan Template ist da"\n\nHey [Name],\n\nHier ist dein Template: [LINK]\n\nKurz zu mir: Ich bin Sarah, Gründerin von Smarthirn.\nIch helfe Solopreneuren Content ohne Chaos zu planen.\n\nDas Template nutze ich selbst seit 2 Jahren.\nSpart mir 8h/Woche.\n\nMorgen schicke ich dir meinen #1 Tipp für schnellere Planung.\n\nCheers,\nSarah\n\nP.S. Antworte auf diese Mail wenn du Fragen hast.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 E-MAIL 2 (3 Tage später):\n\nBetreff: "Wie ich von 10h auf 2h Content-Zeit kam"\n\nHey [Name],\n\nHast du das Template schon genutzt?\n\nFalls nicht - hier ist warum es funktioniert:\n\nVorher: 10h/Woche Content.\nNachher: 2h/Woche Content.\n\nDas Geheimnis? Batch-Planung statt Daily Panic.\n\nIch plane Montags 2h.\nDann nur noch Execution.\n\nProbier's diese Woche:\n1. Blockiere 2h\n2. Nutze Template\n3. Plan für 2 Wochen\n\nSchreib mir wie's lief.\n\nSarah\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 E-MAIL 3 (7 Tage später):\n\nBetreff: "Bereit für den nächsten Schritt?"\n\nHey [Name],\n\nDu hast jetzt:\n✓ Template für Content-Planung\n✓ Batch-Planung Tipp\n\nAber Planning ist nur 20%.\n80% ist: WAS du postest.\n\nDafür hab ich das System-Kit gebaut:\n- 20 Caption-Vorlagen\n- Prompt-Pack für AI\n- Mini-Funnel Blueprint\n\n49€. Einmalig.\n\nKein Abo. Kein Bullshit.\nLife-time Updates.\n\n[LINK]\n\nFalls du dabei bleiben willst mit nur dem Freebie:\nPerfekt! Du bleibst auf der Liste.\n\nBeide Wege sind ok.\n\nSarah\n\nP.S. Größter Einwand den ich höre: "${data.biggestObjection}"\nDazu: [Kurze Antwort auf Einwand]\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\nE-MAIL 1 (sofort):\n- Betreff: Freebie-Delivery (max 50 Zeichen)\n- Willkommen + Download-Link PROMINENT\n- Wer bist du (2-3 Sätze)\n- Was kommt als nächstes (Teaser E-Mail 2)\n- P.S. mit Interaktion\nMAX 100 Wörter\n\nE-MAIL 2 (3 Tage später):\n- Betreff: Bezug zu E-Mail 1\n- Zusätzlicher Tipp (über ${data.freebie} hinaus)\n- Kurze Story oder konkretes Beispiel\n- Frage zur Interaktion\n- Keine Verkaufsaktion\nMAX 150 Wörter\n\nE-MAIL 3 (7 Tage später):\n- Betreff: Benefit-orientiert (nicht "Angebot")\n- Zusammenfassung Wert geliefert\n- Soft-Pitch für ${data.mainOffer}\n- Adressiere ${data.biggestObjection} direkt\n- 2 Optionen: Kaufen ODER kostenlos bleiben (beide ok!)\n- Kein Druck, ehrlich kommunizieren\nMAX 200 Wörter\n\n🚨 E-MAIL-REGELN:\n- Persönlicher Ton (wie an Freund)\n- Kurze Absätze (2-3 Zeilen max)\n- Keine Verkäufer-Sprache\n- ${data.targetAudience} direkt ansprechen\n- ${data.biggestObjection} in E-Mail 3 entkräften\n- P.S. nutzen für wichtige Punkte\n`,
             };
             
             return prompts[id] || `Aufgabe:\nErstelle Content für "${id}".\n\nNutze Brand-Infos oben.\n`;
