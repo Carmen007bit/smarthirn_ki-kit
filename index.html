@@ -700,9 +700,6 @@
         }
 
         function generatePrompt() {
-            console.log('generatePrompt called');
-            console.log('selectedTemplate:', selectedTemplate);
-            
             if (!selectedTemplate) {
                 alert('Bitte wähle erst ein Template aus!');
                 return;
@@ -711,15 +708,10 @@
             const inputData = {};
             selectedTemplate.inputs.forEach(input => {
                 const element = document.getElementById(input.id);
-                console.log(`Reading ${input.id}:`, element ? element.value : 'ELEMENT NOT FOUND');
                 inputData[input.id] = element ? element.value : '';
             });
             
-            console.log('inputData:', inputData);
-            
             const prompt = buildPrompt(selectedTemplate.id, inputData);
-            
-            console.log('Generated prompt length:', prompt.length);
             
             document.getElementById('resultBox').textContent = prompt;
             document.getElementById('output').classList.remove('hidden');
@@ -862,8 +854,6 @@
             event.target.textContent = '✅ Kopiert!';
             setTimeout(() => event.target.textContent = '📋 Prompt kopieren', 2000);
         }
-
-        init();
     </script>
 </body>
 </html>
