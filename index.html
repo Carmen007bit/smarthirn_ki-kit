@@ -69,6 +69,22 @@
             border: 1px solid rgba(16, 48, 48, 0.1);
         }
         
+        #dynamicInputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        #dynamicInputs .form-group {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 1400px) {
+            #dynamicInputs {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .section { margin-bottom: 2rem; }
         .section-title {
             font-size: 0.875rem;
@@ -126,7 +142,12 @@
             border-color: #F8D800;
             box-shadow: 0 0 0 3px rgba(248, 216, 0, 0.1);
         }
-        textarea { min-height: 100px; resize: vertical; }
+        textarea { 
+            min-height: 120px; 
+            resize: vertical;
+            line-height: 1.6;
+            font-family: inherit;
+        }
         
         .btn {
             padding: 0.85rem 1.5rem;
@@ -245,7 +266,7 @@
             font-family: 'Courier New', monospace;
             font-size: 0.9rem;
             white-space: pre-wrap;
-            max-height: 600px;
+            max-height: 800px;
             overflow-y: auto;
             line-height: 1.8;
         }
@@ -671,7 +692,7 @@
                     return `
                         <div class="form-group">
                             <label>${input.label}</label>
-                            <input type="text" id="${input.id}" placeholder="${input.placeholder}">
+                            <textarea id="${input.id}" placeholder="${input.placeholder}"></textarea>
                         </div>
                     `;
                 }
