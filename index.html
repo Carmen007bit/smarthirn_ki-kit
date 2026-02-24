@@ -264,26 +264,12 @@
             padding: 1.75rem;
             margin-top: 1.5rem;
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             white-space: pre-wrap;
             max-height: 800px;
             overflow-y: auto;
             line-height: 1.8;
-        }
-        
-        .status {
-            padding: 1rem 1.25rem;
-            border-radius: 1rem;
-            margin-bottom: 1.25rem;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .status.success {
-            background: #dcfce7;
-            color: #166534;
-            border: 2px solid #bbf7d0;
+            color: #1f2937;
         }
         
         .pro-tip {
@@ -301,77 +287,9 @@
         }
         
         .hidden { display: none !important; }
-        
-        /* MOBILE RESPONSIVE */
+
         @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            
-            .header {
-                padding: 1.5rem;
-                border-radius: 1.5rem;
-            }
-            .header h1 { font-size: 2rem; }
-            .header .tagline { font-size: 1rem; }
-            .header .version { font-size: 0.75rem; padding: 0.4rem 0.75rem; }
-            
-            .grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
-            .sidebar, .main-content {
-                padding: 1.5rem;
-                border-radius: 1.25rem;
-            }
-            
-            .template-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .template-categories {
-                flex-wrap: wrap;
-            }
-            .category-filter {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.75rem;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            .action-buttons button {
-                width: 100%;
-            }
-            
-            .result-box {
-                font-size: 0.85rem;
-                padding: 1.25rem;
-                max-height: 400px;
-            }
-            
-            .pro-tip {
-                padding: 1rem;
-                font-size: 0.9rem;
-            }
-            
-            label { font-size: 0.9rem; }
-            input, textarea, select {
-                font-size: 0.9rem;
-                padding: 0.75rem 1rem;
-            }
-            
-            .btn {
-                padding: 0.75rem 1.25rem;
-                font-size: 0.9rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header h1 { font-size: 1.75rem; }
-            .template-card h3 { font-size: 1rem; }
-            .template-card p { font-size: 0.8rem; }
-            .section-title { font-size: 0.8rem; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -437,23 +355,21 @@
                     
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="saveBrand()">💾 Speichern</button>
-                        <button class="btn btn-outline" onclick="exportBrand()">📤 Export</button>
                     </div>
-                    
-                    <div id="brandStatus" class="hidden"></div>
+                    <div id="statusMsg" style="margin-top: 10px; font-size: 0.8rem; text-align: center;"></div>
                 </div>
             </div>
             
             <!-- MAIN CONTENT -->
             <div class="main-content">
-                <div class="section-title">🎯 Wähle ein Template (10)</div>
+                <div class="section-title">🎯 Wähle ein Template</div>
                 
                 <div class="template-categories">
-                    <button class="category-filter active" onclick="filterCategory('all')">Alle</button>
-                    <button class="category-filter" onclick="filterCategory('social')">Social Media (5)</button>
-                    <button class="category-filter" onclick="filterCategory('ads')">Ads (1)</button>
-                    <button class="category-filter" onclick="filterCategory('email')">E-Mail (1)</button>
-                    <button class="category-filter" onclick="filterCategory('content')">Content (3)</button>
+                    <button class="category-filter active" onclick="filterCategory('all', event)">Alle</button>
+                    <button class="category-filter" onclick="filterCategory('social', event)">Social Media</button>
+                    <button class="category-filter" onclick="filterCategory('ads', event)">Ads</button>
+                    <button class="category-filter" onclick="filterCategory('email', event)">E-Mail</button>
+                    <button class="category-filter" onclick="filterCategory('content', event)">Content</button>
                 </div>
                 
                 <div class="template-grid" id="templateGrid"></div>
@@ -472,7 +388,7 @@
                     
                     <div class="pro-tip">
                         <strong>💡 Nächster Schritt:</strong>
-                        Kopiere diesen Prompt und füge ihn in <strong>claude.ai</strong> oder <strong>ChatGPT</strong> ein. Der Prompt enthält bereits deine Brand Identity und Anti-Generic-Rules.
+                        Kopiere diesen Prompt und füge ihn in <strong>claude.ai</strong> oder <strong>ChatGPT</strong> ein.
                     </div>
                     
                     <div class="result-box" id="resultBox"></div>
@@ -486,78 +402,37 @@
     </div>
 
     <script>
-        // Templates mit erweiterten Input-Feldern
         const templates = [
             {
                 id: 'instagram-post',
                 name: 'Instagram Post',
                 category: 'social',
-                description: 'Quick Win Post für Feed',
+                description: 'Quick Win Post für den Feed',
                 inputs: [
                     { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Warum ich auf organisches Growth setze' },
                     { id: 'goal', label: 'Ziel', type: 'select', options: ['Awareness', 'Engagement', 'Conversion'] },
-                    { id: 'captionType', label: 'Caption-Typ (aus Teil B)', type: 'select', options: ['Personal Story', 'Controversial Take', 'Myth-Busting', 'Before/After', 'List-Style'] },
-                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Startup TaskFlow | Redesign für Nike | SEO-Projekt | Kunde Michael, 38' },
-                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. 0 User, kein Budget | Bounce Rate 78% | Ranking Seite 5 | Keine Fitness-Erfahrung' },
-                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 1.200 User in 30 Tagen | Bounce -55%, Sales +40% | Position 1 in 4 Monaten' },
-                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. Kein Paid - nur Reddit + DMs | 23 A/B-Tests | Cluster-Content | 3x20 Min Training' },
-                    { id: 'insight', label: 'Kernproblem oder Erkenntnis', type: 'text', placeholder: 'z.B. Meiste launchen zu spät | Design > Testing | Keywords ≠ Intent | Motivation < Disziplin' }
-                ]
-            },
-            {
-                id: 'carousel',
-                name: 'Instagram Carousel',
-                category: 'social',
-                description: '5-10 Slides',
-                inputs: [
-                    { id: 'carouselTopic', label: 'Thema/Titel', type: 'text', placeholder: 'z.B. 5 Fehler bei Product Launches | 7 Design-Prinzipien' },
-                    { id: 'slides', label: 'Anzahl Slides', type: 'number', value: '7' },
-                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Startup TaskFlow | Mein letzter Launch | Client-Projekt' },
-                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. 0 User, kein Budget | 6 Monate gebaut, 0 Sales' },
-                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 1.200 User in 30 Tagen | 400 Beta-User vor Launch' },
-                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. Reddit + DMs | Pre-Launch Waitlist | 47 A/B-Tests' },
-                    { id: 'insight', label: 'Kernproblem oder Erkenntnis', type: 'text', placeholder: 'z.B. Meiste launchen zu spät | Design ≠ Conversion' }
+                    { id: 'captionType', label: 'Caption-Typ', type: 'select', options: ['Personal Story', 'Controversial Take', 'Myth-Busting', 'Before/After', 'List-Style'] },
+                    { id: 'example', label: 'Beispiel/Projekt', type: 'text', placeholder: 'z.B. Mein Redesign für Nike' }
                 ]
             },
             {
                 id: 'linkedin-thought',
                 name: 'LinkedIn Thought Leadership',
                 category: 'social',
-                description: 'Meinungspost',
+                description: 'Starke Meinung oder Expertise teilen',
                 inputs: [
-                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Warum die meisten zu spät launchen' },
-                    { id: 'goal', label: 'Ziel', type: 'select', options: ['Awareness', 'Engagement', 'Conversion'] },
-                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Startup TaskFlow | Mein letzter Launch | Redesign-Projekt' },
-                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. 6 Monate gebaut, 0 Validation | Bounce Rate 78% | 0 User' },
-                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 12 Sales in Monat 1 | Bounce -55% | 1.2k User in 30 Tagen' },
-                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. Pre-Launch mit Waitlist | 47 A/B-Tests | Reddit statt Ads' },
-                    { id: 'insight', label: 'Kernproblem oder Erkenntnis', type: 'text', placeholder: 'z.B. Die meisten bauen zu lang | Design ≠ Conversion | Validation > Perfection' }
+                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Warum SEO 2024 tot ist' },
+                    { id: 'insight', label: 'Kern-Erkenntnis', type: 'text', placeholder: 'z.B. Qualität schlägt Quantität' }
                 ]
             },
             {
                 id: 'hooks-generator',
                 name: '30 Hook-Varianten',
                 category: 'content',
-                description: 'Verschiedene Ansätze',
+                description: 'Aufmerksamkeitsstarke Headlines',
                 inputs: [
-                    { id: 'mainTopic', label: 'Hauptthema', type: 'text', placeholder: 'z.B. Product Launches | SEO für SaaS | Design-Prozess' },
-                    { id: 'bestExample', label: 'Dein stärkstes Beispiel (kurz)', type: 'text', placeholder: 'z.B. 0 → $10k MRR | Bounce -70% | 10k Follower in 3 Monaten' },
-                    { id: 'surprisingNumber', label: 'Überraschende Zahl/Fakt', type: 'text', placeholder: 'z.B. 87% scheitern | $50k verbrannt | 6 Monate = 0 Sales' }
-                ]
-            },
-            {
-                id: 'reel-script',
-                name: 'Reel/TikTok Script',
-                category: 'social',
-                description: '30-60 Sekunden',
-                inputs: [
-                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Wie ich mein erstes $1k verdient habe' },
-                    { id: 'duration', label: 'Dauer', type: 'select', options: ['30s', '45s', '60s'] },
-                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Mein erstes Produkt | Client-Projekt | Mein Tool' },
-                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. $0 Revenue, keine Audience | Client Brief unclear' },
-                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. $1.2k in 2 Wochen | +40% Conversions | 500 Signups' },
-                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. Twitter-DMs statt Ads | 23 A/B-Tests | 48h MVP' },
-                    { id: 'visualHook', label: 'Visueller Hook (erste 3 Sek)', type: 'text', placeholder: 'z.B. Zeige Laptop mit $0 → $1.2k | Vorher/Nachher Screenshot' }
+                    { id: 'mainTopic', label: 'Hauptthema', type: 'text', placeholder: 'z.B. Zeitmanagement' },
+                    { id: 'bestExample', label: 'Stärkstes Beispiel', type: 'text', placeholder: 'z.B. Von 0 auf 10k MRR' }
                 ]
             },
             {
@@ -566,76 +441,48 @@
                 category: 'ads',
                 description: 'Facebook/Instagram Ads',
                 inputs: [
-                    { id: 'product', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit | SEO-Audit | Design-Template | Fitness-Coaching' },
-                    { id: 'targetAudience', label: 'Zielgruppe (spezifisch)', type: 'text', placeholder: 'z.B. Solopreneure mit 1-3 Jahren Erfahrung | SaaS-Gründer pre-PMF | Designer 25-35' },
-                    { id: 'mainProblem', label: 'Hauptproblem der Zielgruppe', type: 'text', placeholder: 'z.B. Content-Chaos | Keine organischen Leads | Kein Design-System' },
-                    { id: 'offer', label: 'Angebot/CTA', type: 'text', placeholder: 'z.B. Jetzt für 49€ | Gratis Audit | 7-Tage Trial' },
-                    { id: 'biggestObjection', label: 'Größter Einwand', type: 'text', placeholder: 'z.B. Keine Zeit | Zu teuer | Funktioniert das wirklich?' }
-                ]
-            },
-            {
-                id: 'email-sequence',
-                name: 'E-Mail Sequenz',
-                category: 'email',
-                description: '3-5 E-Mails',
-                inputs: [
-                    { id: 'freebie', label: 'Freebie/Lead Magnet', type: 'text', placeholder: 'z.B. Content-Plan Template | SEO-Checklist | Design-System' },
-                    { id: 'emailCount', label: 'Anzahl E-Mails', type: 'number', value: '3' },
-                    { id: 'mainOffer', label: 'Haupt-Angebot (Paid Product)', type: 'text', placeholder: 'z.B. System-Kit für 49€ | Coaching für 299€ | Template Bundle' },
-                    { id: 'usp', label: 'Warum dein Produkt kaufen? (USP)', type: 'text', placeholder: 'z.B. Spart 8h/Woche | Lifetime Updates | Kein Abo | Praxiserprobt seit 2 Jahren' },
-                    { id: 'targetAudience', label: 'Zielgruppe', type: 'text', placeholder: 'z.B. Solopreneure | SaaS-Gründer | Freelance Designer' },
-                    { id: 'biggestObjection', label: 'Größter Einwand gegen Kauf', type: 'text', placeholder: 'z.B. Keine Zeit | Zu teuer | Brauche ich das wirklich?' }
-                ]
-            },
-            {
-                id: 'landing-page',
-                name: 'Landing Page Copy',
-                category: 'content',
-                description: 'Hero, Benefits, CTA',
-                inputs: [
-                    { id: 'lpProduct', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit | SEO-Coaching | Template Bundle' },
-                    { id: 'mainBenefit', label: 'Hauptnutzen (Outcome)', type: 'text', placeholder: 'z.B. Content in 60 Min planen | Organische Leads ohne Ads | Design in halber Zeit' },
-                    { id: 'price', label: 'Preis', type: 'text', placeholder: 'z.B. 49€ einmalig | 99€/Monat | 299€ Lifetime' },
-                    { id: 'topObjections', label: 'Top 3 Einwände (kommagetrennt)', type: 'text', placeholder: 'z.B. Keine Zeit, Zu teuer, Funktioniert das?' },
-                    { id: 'targetAudience', label: 'Zielgruppe', type: 'text', placeholder: 'z.B. Solopreneure 1-3 Jahre | SaaS-Gründer pre-PMF' }
-                ]
-            },
-            {
-                id: 'twitter-thread',
-                name: 'Twitter/X Thread',
-                category: 'social',
-                description: '8-15 Tweets',
-                inputs: [
-                    { id: 'topic', label: 'Thema', type: 'text', placeholder: 'z.B. Wie ich von 0 auf 10k Follower kam' },
-                    { id: 'example', label: 'Beispiel/Fall/Projekt', type: 'text', placeholder: 'z.B. Mein Twitter-Growth | Launch von Produkt X | SEO-Case' },
-                    { id: 'startSituation', label: 'Ausgangssituation', type: 'text', placeholder: 'z.B. 200 Follower, 0 Engagement | 0 Sales | Ranking Seite 7' },
-                    { id: 'result', label: 'Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 10k Follower in 4 Monaten | $12k Sales | Position 1' },
-                    { id: 'method', label: 'Deine Methode/Herangehensweise', type: 'text', placeholder: 'z.B. 1 Thread/Tag + Engagement | Pre-Launch Waitlist | Cluster-Content' },
-                    { id: 'insight', label: 'Kernproblem oder Erkenntnis', type: 'text', placeholder: 'z.B. Consistency > Virality | Validation > Building | Intent > Keywords' }
-                ]
-            },
-            {
-                id: 'case-study',
-                name: 'Case Study',
-                category: 'content',
-                description: 'Vorher/Nachher',
-                inputs: [
-                    { id: 'projectName', label: 'Projekt/Kunde/Name', type: 'text', placeholder: 'z.B. Startup TaskFlow | Redesign für E-Commerce | Kunde Sarah, 32' },
-                    { id: 'before', label: 'Vorher-Situation (mit Zahlen)', type: 'text', placeholder: 'z.B. 0 Leads, Bounce 78% | 200 Follower, 0 Sales | 95kg, keine Kondition' },
-                    { id: 'after', label: 'Nachher-Ergebnis (mit Zahlen)', type: 'text', placeholder: 'z.B. 340 Leads/Monat, Bounce 23% | 10k Follower, $12k Sales | 79kg, 5km in 28 Min' },
-                    { id: 'method', label: 'Deine Methode/Was du gemacht hast', type: 'text', placeholder: 'z.B. SEO-Cluster + Reddit | 1 Thread/Tag + DMs | 3x20 Min Training' },
-                    { id: 'timeframe', label: 'Zeitraum', type: 'text', placeholder: 'z.B. 4 Monate | 90 Tage | 6 Monate' }
+                    { id: 'product', label: 'Produkt/Service', type: 'text', placeholder: 'z.B. System-Kit' },
+                    { id: 'offer', label: 'Angebot/CTA', type: 'text', placeholder: 'z.B. Jetzt 20% sparen' }
                 ]
             }
         ];
 
         let selectedTemplate = null;
-        let brandData = {};
         let currentFilter = 'all';
 
         function init() {
             loadBrand();
             renderTemplates();
+        }
+
+        function loadBrand() {
+            const saved = localStorage.getItem('promptEngine_brand');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('brandName').value = data.brandName || '';
+                document.getElementById('offering').value = data.offering || '';
+                document.getElementById('audience').value = data.audience || '';
+                document.getElementById('pillars').value = data.pillars || '';
+                document.getElementById('usps').value = data.usps || '';
+                document.getElementById('voice').value = data.voice || 'direkt';
+                document.getElementById('noGos').value = data.noGos || '';
+            }
+        }
+
+        function saveBrand() {
+            const data = {
+                brandName: document.getElementById('brandName').value,
+                offering: document.getElementById('offering').value,
+                audience: document.getElementById('audience').value,
+                pillars: document.getElementById('pillars').value,
+                usps: document.getElementById('usps').value,
+                voice: document.getElementById('voice').value,
+                noGos: document.getElementById('noGos').value
+            };
+            localStorage.setItem('promptEngine_brand', JSON.stringify(data));
+            const msg = document.getElementById('statusMsg');
+            msg.innerText = "✅ Brand-Daten gespeichert!";
+            setTimeout(() => msg.innerText = "", 2000);
         }
 
         function renderTemplates() {
@@ -645,7 +492,7 @@
                 : templates.filter(t => t.category === currentFilter);
             
             grid.innerHTML = filtered.map(t => `
-                <div class="template-card" onclick="selectTemplate('${t.id}')" data-category="${t.category}">
+                <div class="template-card ${selectedTemplate?.id === t.id ? 'active' : ''}" onclick="selectTemplate('${t.id}')">
                     <span class="category-tag">${t.category}</span>
                     <h3>${t.name}</h3>
                     <p>${t.description}</p>
@@ -653,17 +500,16 @@
             `).join('');
         }
 
-        function filterCategory(category) {
+        function filterCategory(category, event) {
             currentFilter = category;
             document.querySelectorAll('.category-filter').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
             renderTemplates();
         }
 
         function selectTemplate(id) {
             selectedTemplate = templates.find(t => t.id === id);
-            document.querySelectorAll('.template-card').forEach(card => card.classList.remove('active'));
-            event.target.closest('.template-card').classList.add('active');
+            renderTemplates();
             renderTemplateInputs();
             document.getElementById('templateInputs').classList.remove('hidden');
             document.getElementById('output').classList.add('hidden');
@@ -676,7 +522,7 @@
                     return `
                         <div class="form-group">
                             <label>${input.label}</label>
-                            <select id="${input.id}">
+                            <select id="input_${input.id}">
                                 ${input.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
                             </select>
                         </div>
@@ -685,14 +531,14 @@
                     return `
                         <div class="form-group">
                             <label>${input.label}</label>
-                            <input type="number" id="${input.id}" placeholder="${input.placeholder}" value="${input.value || ''}">
+                            <input type="number" id="input_${input.id}" value="${input.value || ''}">
                         </div>
                     `;
                 } else {
                     return `
                         <div class="form-group">
                             <label>${input.label}</label>
-                            <textarea id="${input.id}" placeholder="${input.placeholder}"></textarea>
+                            <textarea id="input_${input.id}" placeholder="${input.placeholder || ''}"></textarea>
                         </div>
                     `;
                 }
@@ -700,159 +546,64 @@
         }
 
         function generatePrompt() {
-            if (!selectedTemplate) {
-                alert('Bitte wähle erst ein Template aus!');
-                return;
-            }
-            
-            const inputData = {};
-            selectedTemplate.inputs.forEach(input => {
-                const element = document.getElementById(input.id);
-                inputData[input.id] = element ? element.value : '';
-            });
-            
-            const prompt = buildPrompt(selectedTemplate.id, inputData);
-            
-            document.getElementById('resultBox').textContent = prompt;
+            if (!selectedTemplate) return;
+
+            // Brand Daten
+            const brandName = document.getElementById('brandName').value;
+            const offering = document.getElementById('offering').value;
+            const audience = document.getElementById('audience').value;
+            const voice = document.getElementById('voice').value;
+            const noGos = document.getElementById('noGos').value;
+
+            // Template Daten sammeln
+            const templateDetails = selectedTemplate.inputs.map(inp => {
+                const val = document.getElementById('input_' + inp.id).value;
+                return `${inp.label}: ${val}`;
+            }).join('\n');
+
+            const promptText = `
+DU BIST EIN EXPERTE FÜR CONTENT-MARKETING UND COPYWRITING.
+DEINE AUFGABE IST ES, CONTENT FÜR FOLGENDE MARKE ZU ERSTELLEN:
+
+--- MARKEN-IDENTITÄT ---
+Name: ${brandName || 'Nicht angegeben'}
+Angebot: ${offering || 'Nicht angegeben'}
+Zielgruppe: ${audience || 'Nicht angegeben'}
+Tonalität: ${voice}
+No-Go Wörter (NIEMALS VERWENDEN): ${noGos || 'Keine'}
+
+--- AUFGABE: ${selectedTemplate.name} ---
+${templateDetails}
+
+--- INSTRUKTIONEN ---
+1. Schreibe einen Entwurf, der exakt zur oben genannten Tonalität passt.
+2. Vermeide generische KI-Phrasen wie "In der heutigen Welt" oder "Tauche ein".
+3. Nutze die Brand-USPs und fokussiere dich auf den Nutzen für die Zielgruppe.
+4. Gib mir das Ergebnis direkt im Textformat aus.
+
+ERSTELLE JETZT DEN CONTENT:
+`.trim();
+
+            document.getElementById('resultBox').innerText = promptText;
             document.getElementById('output').classList.remove('hidden');
+            
+            // Scroll zum Ergebnis
             document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function buildPrompt(templateId, data) {
-            const brand = brandData;
-            let prompt = '';
-            
-            prompt += `Rolle: Du bist Content-Stratege.\n\n`;
-            prompt += `Brand-Kontext:\n`;
-            prompt += `- Marke: ${brand.name || '[Marke]'}\n`;
-            prompt += `- Angebot: ${brand.offering || '[Angebot]'}\n`;
-            prompt += `- Zielgruppe: ${brand.audience || '[Zielgruppe]'}\n`;
-            if (brand.pillars) prompt += `- Content-Säulen: ${brand.pillars}\n`;
-            prompt += `- USPs: ${brand.usps || '[USPs]'}\n`;
-            prompt += `- Tonalität: ${brand.voice || 'direkt'}\n`;
-            if (brand.noGos) prompt += `- No-Go-Wörter: ${brand.noGos}\n`;
-            prompt += `\n`;
-            
-            prompt += getTemplatePrompt(templateId, data);
-            
-            prompt += `\n🚨 ANTI-GENERIC-RULES (ZWINGEND - BEI VERSTOẞ KOMPLETT NEU):\n\n`;
-            prompt += `1. VERBOTENE WÖRTER (nutze KEINS davon):\n`;
-            if (brand.noGos) {
-                prompt += `   - ${brand.noGos}\n`;
-            }
-            prompt += `   - "Game-Changer", "Transform", "Journey", "Entdecke"\n`;
-            prompt += `   - "Revolutionär", "Einzigartig", "Ultimativ"\n`;
-            prompt += `   - "Tauche ein", "Level up", "Next Level"\n\n`;
-            
-            prompt += `2. KONKRETE BEISPIELE PFLICHT:\n`;
-            prompt += `   - Keine vagen Aussagen ("viele Kunden", "oft")\n`;
-            prompt += `   - Stattdessen: Zahlen, Namen, spezifische Situationen\n`;
-            prompt += `   - Beispiel FALSCH: "Viele scheitern"\n`;
-            prompt += `   - Beispiel RICHTIG: "73% meiner Kunden in Q4 2025 scheiterten weil..."\n\n`;
-            
-            prompt += `3. SATZ-LÄNGE:\n`;
-            prompt += `   - Max 15 Wörter pro Satz (zähle nach!)\n`;
-            prompt += `   - Bei Überschreitung: Satz aufteilen\n\n`;
-            
-            prompt += `4. AKTIVE SPRACHE:\n`;
-            prompt += `   - Kein Passiv ("wurde gemacht")\n`;
-            prompt += `   - Stattdessen: Subjekt-Verb-Objekt\n\n`;
-            
-            prompt += `5. SPEZIFISCHE CTAs:\n`;
-            prompt += `   - VERBOTEN: "Was denkst du?", "Kennst du das?"\n`;
-            prompt += `   - STATTDESSEN: Frage die sich auf spezifischen Content bezieht\n\n`;
-            
-            prompt += `6. BRAND VOICE: ${brand.voice || 'direkt'}\n\n`;
-            
-            prompt += `7. PERSÖNLICHE NOTE:\n`;
-            prompt += `   - Mindestens 1 Ich-Perspektive\n`;
-            prompt += `   - Eigene Erfahrung (konkret!)\n\n`;
-            
-            prompt += `8. FINAL CHECK:\n`;
-            prompt += `   - Klingt es nach ${brand.name} oder nach jedem anderen?\n`;
-            prompt += `   - Wenn austauschbar: KOMPLETT NEU SCHREIBEN\n`;
-            
-            return prompt;
-        }
-
-        function getTemplatePrompt(id, data) {
-            const prompts = {
-                'instagram-post': `Aufgabe:\nErstelle einen Instagram-Post über "${data.topic}".\n\nZiel: ${data.goal}\nCaption-Typ: ${data.captionType}\n\n🎯 DEINE DETAILS:\n- Beispiel/Fall: ${data.example}\n- Ausgangssituation: ${data.startSituation}\n- Ergebnis: ${data.result}\n- Deine Methode: ${data.method}\n- Kernproblem/Erkenntnis: ${data.insight}\n\n✅ BEISPIELE FÜR GUTE POSTS (VERSCHIEDENE BRANCHEN):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 MARKETING/GROWTH:\n\n"Mein SEO-Experiment: 0 auf 12.000 Visits.\nKein Budget. Kein Team. Nur eine These.\n\nDie meisten starten mit Keywords. Ich startete mit Reddit-Threads.\n500 Fragen. 0 Rankings. Alle sagten das ist Zeitverschwendung.\n\n4 Monate später: Position 1 für 'project management tools'.\n12.000 Visits/Monat. 340 Signups.\n\nDas Geheimnis? Keywords != User Intent.\nReddit zeigt dir was Leute WIRKLICH suchen.\n\nOptimierst du für Keywords oder für Menschen?"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💻 SAAS/PRODUCT:\n\n"Meine App: 3x gefloppt. 4. Versuch: 10k Downloads Woche 1.\n\nWas war anders?\n\nApp 1-3: 6 Monate Entwicklung. Perfect Code. 0 User.\nApp 4: 48 Stunden MVP. Broken UI. 400 Beta-Tester Tag 1.\n\nDer Unterschied: Ich hab VORHER verkauft.\n250 Leute auf Waitlist bevor ich eine Zeile Code schrieb.\n\nDie meisten bauen zu lange. Ich teste zu früh.\n\nLaunchst du oder perfektionierst du?"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🎨 DESIGN/CREATIVE:\n\n"Client wollte 'modernes Design'.\nBounce Rate war 78%. Conversions im Keller.\n\nIch hab ihm kein modernes Design verkauft.\nIch hab 23 A/B-Tests gefahren.\n\nErgebnis: Bounce Rate 23%. Sales +40%.\nDas Design? Weniger 'modern' als vorher.\n\nAber: Klarere Headlines. Größere CTAs. Weniger Schnickschnack.\n\nGutes Design löst Probleme. Es gewinnt keine Awards.\n\nDesignst du für Behance oder für Conversions?"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💪 COACHING/BERATUNG:\n\n"Michael. 38. Banker. 92kg bei 1,78m.\nKeine Zeit für Gym. Ich hab ihm auch kein Gym verkauft.\n\n3x20 Minuten. Zuhause. Zwischen Frühstück und Duschen.\nKeine fancy Ausrüstung. Keine Ausreden.\n\n6 Monate: 6kg Muskeln. Gleicher Job. Gleiche Familie. Anderes System.\n\nDisziplin schlägt Motivation. Jedes Mal.\n\nHast du 20 Minuten zwischen zwei Terminen? Dann reicht das."\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n❌ SO NICHT (GENERISCH - KÖNNTE VON JEDEM SEIN):\n\n"Ich habe ein krasses Projekt abgeschlossen!\nDas Ergebnis war unglaublich!\n\nHier sind 3 Learnings:\n- Bleib fokussiert\n- Glaub an dich  \n- Gib niemals auf\n\nWas denkst du? 💪🚀"\n\n→ WARUM SCHLECHT:\n- Keine konkreten Zahlen\n- Austauschbare Phrasen\n- Könnte jeder gepostet haben\n- Keine echte Story\n- Generic CTAs\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 JETZT ERSTELLE DEINEN POST:\n\nStruktur:\n\n1. HOOK (max 12 Wörter):\n   - Nutze ${data.example} ODER ${data.result}\n   - Beispiel: "${data.example}: ${data.result}"\n   - NICHT: "Ich möchte eine Story teilen"\n\n2. SITUATION (2-3 Sätze):\n   - ${data.startSituation} konkret beschreiben\n   - Bildlich, spezifisch, ohne Floskeln\n   - Zahlen wo möglich\n\n3. DEINE HERANGEHENSWEISE (2-3 Sätze):\n   - ${data.method} erklären\n   - ${data.insight} einbauen  \n   - Was du ANDERS gemacht hast\n\n4. ERGEBNIS (1-2 Sätze):\n   - ${data.result} mit konkreten Zahlen\n   - NICHT "Das Ergebnis?" - direkt zum Punkt\n\n5. LEARNING/TAKEAWAY (1 Satz):\n   - Kernaussage aus ${data.insight}\n   - Kurz. Knackig. Kein Bullshit.\n\n6. CTA:\n   - Spezifische Frage zu ${data.method} oder ${data.insight}\n   - NICHT: "Was denkst du?" oder "Kennst du das?"\n   - Beispiel: "Testest du früh oder perfektionierst du lange?"\n\nMAX 150 Wörter.\n\n🚨 KRITISCHE REGELN:\n- Alle Elemente (${data.example}, ${data.result}, ${data.method}, ${data.insight}) müssen vorkommen\n- Kein Satz über 15 Wörter  \n- Kein Passiv\n- Keine Emojis (außer max 1 am Ende)\n- Konkrete Zahlen > vage Aussagen\n- Aktive Sprache\n- Deine Voice, nicht Generic-Coach-Speak\n`,
-                
-                'carousel': `Aufgabe:\nCarousel mit ${data.slides} Slides zum Thema "${data.carouselTopic}".\n\n🎯 DEINE DETAILS:\n- Beispiel/Fall: ${data.example}\n- Ausgangssituation: ${data.startSituation}\n- Ergebnis: ${data.result}\n- Methode: ${data.method}\n- Erkenntnis: ${data.insight}\n\n✅ BEISPIELE GUTER CAROUSELS:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 MARKETING:\nThema: "5 Launch-Fehler die mich $10k gekostet haben"\n\nSlide 1: "Du machst Fehler #3" [Hook]\nSlide 2: "Zu spät gelauncht" - 6 Monate perfektioniert, 0 Sales\nSlide 3: "Kein Pre-Launch" - 0 Waitlist = 0 Day-1-Sales\nSlide 4: "Falsches Pricing" - $99 zu teuer, $29 zu billig\nSlide 5: "Keine Urgency" - Kein Reason to buy NOW\nSlide 6: "Follow-up vergessen" - 70% brauchen 3+ Touches\nSlide 7: "Nächstes Mal?" + CTA\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n💻 SAAS:\nThema: "7 Dinge vor meinem ersten $1k MRR"\n\nSlide 1: "$0 → $1.200 MRR in 4 Monaten"\nSlide 2: "Build in Public" - 300 Follower → 1.2k in 3 Monaten\nSlide 3: "Pricing 3x erhöht" - $9 → $29, gleiche Conversion\nSlide 4-7: Weitere Learnings mit Zahlen\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\nSlide 1 (Hook):\n- Überschrift: Max 5 Wörter, provokativ\n- NICHT: "${data.carouselTopic}" (zu langweilig)\n- BESSER: Nutze ${data.result} oder "${data.insight}"\n- Teaser auf kommende Slides\n\nSlide 2-${data.slides-1} (Content):\n- Pro Slide: 1 Hauptpunkt\n- Überschrift (5 Wörter max)\n- 2-3 Bullets (je max 15 Wörter)\n- Erzähle die Story: ${data.startSituation} → ${data.method} → ${data.result}\n- ${data.insight} muss klar rauskommen\n- Konkrete Zahlen wo möglich\n\nSlide ${data.slides} (CTA):\n- Zusammenfassung ${data.insight} (1 Satz)\n- CTA: NICHT "Save this"\n- BESSER: "Welcher Punkt trifft bei dir zu?" oder "Schreib mir für X"\n\nPro Slide:\n- Icon/Emoji-Vorschlag\n- Farb-Suggestion (wenn relevant)\n\n⚠️ VERBOTEN:\n- Generische Tipps ohne Zahlen\n- "Die meisten Menschen..."\n- "Hier sind X Dinge..."\n`,
-                
-                'linkedin-thought': `Aufgabe:\nErstelle einen LinkedIn Post über "${data.topic}".\n\nZiel: ${data.goal}\n\n🎯 DEINE DETAILS:\n- Beispiel/Fall: ${data.example}\n- Ausgangssituation: ${data.startSituation}\n- Ergebnis: ${data.result}\n- Methode: ${data.method}\n- Erkenntnis: ${data.insight}\n\n✅ LINKEDIN-FORMAT (Professional aber meinungsstark):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nBEISPIEL MARKETING:\n\n"Die meisten launchen zu spät.\n\nMein letzter Product-Launch: 6 Monate Entwicklung. Perfect Product. 12 Sales in Monat 1.\n\nHeute: 48h MVP. Broken UI. 400 Beta-User vor Launch.\n\nDer Unterschied? Ich verkaufe BEVOR ich baue.\n250 Waitlist → dann erst Code.\n\nValidation > Perfection.\n\nLaunchst du oder perfektionierst du?"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 STRUKTUR:\n\n1. HOOK (1-2 Sätze):\n   - Steile These aus ${data.insight}\n   - Provokativ, meinungsstark\n   - NICHT "Ich möchte etwas teilen"\n\n2. DEINE STORY (3-4 Absätze):\n   - ${data.example}: ${data.startSituation}\n   - Was lief schief / Was hast du gelernt\n   - ${data.method} - wie du es gelöst hast\n   - ${data.result} mit Zahlen\n\n3. LEARNING (1-2 Sätze):\n   - ${data.insight} ausformulieren\n   - Ohne Bullshit\n\n4. CTA:\n   - Frage die Diskussion startet\n   - NICHT "Thoughts?"\n   - Bezug auf ${data.insight}\n\nMAX 300 Wörter.\n\n⚠️ LINKEDIN-REGELN:\n- Keine Emojis (professional bleiben)\n- Kurze Absätze (2-3 Zeilen max)\n- Keine Hashtags im Text (max 3 am Ende)\n- Erste 2 Zeilen = Hook (entscheiden über "Mehr anzeigen")\n`,
-                
-                'hooks-generator': `Aufgabe:\nGeneriere 30 verschiedene Hooks zum Thema "${data.mainTopic}".\n\n🎯 DEINE DETAILS:\n- Hauptthema: ${data.mainTopic}\n- Stärkstes Beispiel: ${data.bestExample}\n- Überraschende Zahl: ${data.surprisingNumber}\n\n✅ HOOK-TYPEN MIT BEISPIELEN:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n1. CONTROVERSIAL TAKE (3 Hooks):\n"${data.surprisingNumber} - niemand spricht darüber"\n"Unpopular: [steile Meinung zu ${data.mainTopic}]"\n"Die meisten machen [X] falsch bei ${data.mainTopic}"\n\n2. DATA-DRIVEN (3 Hooks):\n"${data.surprisingNumber}"\n"Studie: [Zahl] über ${data.mainTopic}"\n"Ich hab [Zahl] analysiert über ${data.mainTopic}"\n\n3. PERSONAL STORY (3 Hooks):\n"${data.bestExample}"\n"Ich war [Bad State]. Heute: [Good State]."\n"Mein größter Fehler bei ${data.mainTopic}"\n\n4. QUESTION-FIRST (3 Hooks):\n"Warum scheitern [X%] bei ${data.mainTopic}?"\n"Was wenn [provokante Annahme]?"\n"Kennst du den Unterschied zwischen [X] und [Y]?"\n\n5. MYTH-BUSTING (3 Hooks):\n"Man sagt ${data.mainTopic} ist [X]. Aber..."\n"Das größte Missverständnis über ${data.mainTopic}"\n"[Common Belief] ist Bullshit"\n\n6. BEFORE/AFTER (3 Hooks):\n"Von [Bad] zu [Good]: ${data.bestExample}"\n"Vorher: [X]. Nachher: [Y]."\n"${data.mainTopic}: Wie ich [Transformation]"\n\n7. NOBODY TALKS ABOUT (3 Hooks):\n"Nobody talks about [hidden truth] bei ${data.mainTopic}"\n"Das verschweigen alle über ${data.mainTopic}"\n"Dein [X] sagt dir nicht: [Truth]"\n\n8. REVERSE PSYCHOLOGY (3 Hooks):\n"Hör auf mit ${data.mainTopic}"\n"Warum du [X] nicht tun solltest"\n"Vergiss [common advice] bei ${data.mainTopic}"\n\n9. UNPOPULAR OPINION (3 Hooks):\n"Unpopular: ${data.mainTopic} ist überbewertet"\n"Ich glaube nicht an [common belief]"\n"${data.mainTopic}? Braucht kein Mensch. Außer..."\n\n10. CONTRAST (3 Hooks):\n"Most people [X]. Best people [Y]."\n"Du machst [X]. Du solltest [Y]."\n"${data.mainTopic}: Common vs Effective"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT 30 HOOKS:\n\nPro Typ: 3 verschiedene Hooks\n\nREGELN:\n- MAX 12 Wörter pro Hook\n- Keine Emojis\n- Keine Wiederholungen\n- ${data.surprisingNumber} mind. 3x verwenden (verschiedene Hooks)\n- ${data.bestExample} mind. 2x verwenden\n- Konkrete Zahlen > vage Aussagen\n- Jeder Hook muss standalone funktionieren\n\n⚠️ VERBOTEN:\n- "Lass mich dir erzählen..."\n- "Hier ist warum..."\n- "Du wirst nicht glauben..."\n- Generische Clickbait\n\nFormat:\n1. [Hook]\n2. [Hook]\n...\n30. [Hook]\n`,
-                
-                'email-sequence': `Aufgabe:\nErstelle ${data.emailCount}-E-Mail-Sequenz für Lead Magnet "${data.freebie}".\n\n🎯 DEINE DETAILS:\n- Freebie: ${data.freebie}\n- Haupt-Angebot: ${data.mainOffer}\n- USP/Kaufgrund: ${data.usp}\n- Zielgruppe: ${data.targetAudience}\n- Größter Einwand: ${data.biggestObjection}\n\n✅ BEISPIEL SEQUENZ (3 E-Mails):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 E-MAIL 1 (Sofort nach Opt-In):\n\nBetreff: "Dein Content-Plan Template ist da"\n\nHey [Name],\n\nHier ist dein Template: [LINK]\n\nKurz zu mir: Ich bin Sarah, Gründerin von Smarthirn.\nIch helfe Solopreneuren Content ohne Chaos zu planen.\n\nDas Template nutze ich selbst seit 2 Jahren.\nSpart mir 8h/Woche.\n\nMorgen schicke ich dir meinen #1 Tipp für schnellere Planung.\n\nCheers,\nSarah\n\nP.S. Antworte auf diese Mail wenn du Fragen hast.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 E-MAIL 2 (3 Tage später):\n\nBetreff: "Wie ich von 10h auf 2h Content-Zeit kam"\n\nHey [Name],\n\nHast du das Template schon genutzt?\n\nFalls nicht - hier ist warum es funktioniert:\n\nVorher: 10h/Woche Content.\nNachher: 2h/Woche Content.\n\nDas Geheimnis? Batch-Planung statt Daily Panic.\n\nIch plane Montags 2h.\nDann nur noch Execution.\n\nProbier's diese Woche:\n1. Blockiere 2h\n2. Nutze Template\n3. Plan für 2 Wochen\n\nSchreib mir wie's lief.\n\nSarah\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 E-MAIL 3 (7 Tage später):\n\nBetreff: "Bereit für den nächsten Schritt?"\n\nHey [Name],\n\nDu hast jetzt:\n✓ Template für Content-Planung\n✓ Batch-Planung Tipp\n\nAber Planning ist nur 20%.\n80% ist: WAS du postest.\n\nDafür hab ich das System-Kit gebaut:\n- 20 Caption-Vorlagen\n- Prompt-Pack für AI\n- Mini-Funnel Blueprint\n\nWarum kaufen?\n→ Spart 8h/Woche (getestet mit 200+ Solopreneuren)\n→ Lifetime Updates, kein Abo\n→ Praxiserprobt seit 2 Jahren\n\n49€. Einmalig.\n\n[LINK]\n\nFalls du dabei bleiben willst mit nur dem Freebie:\nPerfekt! Du bleibst auf der Liste.\n\nBeide Wege sind ok.\n\nSarah\n\nP.S. Größter Einwand: "Keine Zeit zum Umsetzen"\nDazu: Das Kit ist in 60 Min einsatzbereit.\nKeine Lernkurve. Direkt anwendbar.\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\nE-MAIL 1 (sofort):\n- Betreff: Freebie-Delivery (max 50 Zeichen)\n- Willkommen + Download-Link PROMINENT\n- Wer bist du (2-3 Sätze)\n- Teaser was kommt (E-Mail 2)\n- P.S. mit Interaktion\nMAX 100 Wörter\n\nE-MAIL 2 (3 Tage später):\n- Betreff: Bezug zu E-Mail 1\n- Zusätzlicher Tipp (über ${data.freebie} hinaus)\n- Kurze Story oder konkretes Beispiel\n- Frage zur Interaktion\n- Keine Verkaufsaktion\nMAX 150 Wörter\n\nE-MAIL 3 (7 Tage später):\n- Betreff: Benefit-orientiert (nicht "Angebot")\n- Zusammenfassung Wert geliefert\n- Soft-Pitch für ${data.mainOffer}\n- WARUM KAUFEN: ${data.usp} klar kommunizieren\n- Adressiere ${data.biggestObjection} direkt im P.S.\n- 2 Optionen: Kaufen ODER kostenlos bleiben (beide ok!)\n- Kein Druck, ehrlich kommunizieren\nMAX 200 Wörter\n\n🚨 E-MAIL-REGELN:\n- Persönlicher Ton (wie an Freund)\n- Kurze Absätze (2-3 Zeilen max)\n- Keine Verkäufer-Sprache\n- ${data.targetAudience} direkt ansprechen\n- ${data.usp} in E-Mail 3 klar herausstellen\n- ${data.biggestObjection} in E-Mail 3 entkräften\n- P.S. nutzen für wichtige Punkte\n`,
-                
-                'reel-script': `Aufgabe:\nSchreibe ein ${data.duration} Reel/TikTok Script über "${data.topic}".\n\n🎯 DEINE DETAILS:\n- Beispiel/Fall: ${data.example}\n- Ausgangssituation: ${data.startSituation}\n- Ergebnis: ${data.result}\n- Methode: ${data.method}\n- Visueller Hook: ${data.visualHook}\n\n✅ REEL-BEISPIEL (45s):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n[0-3s] HOOK:\nVISUELL: ${data.visualHook}\nTEXT OVERLAY: "${data.result}"\nVOICEOVER: "Mein erstes Produkt: $0. 4. Versuch: $12k."\n\n[3-15s] PROBLEM:\nVISUELL: Zeige Laptop mit ${data.startSituation}\nVOICEOVER: "${data.startSituation}"\n"Ich hab alles falsch gemacht."\nTEXT OVERLAY: "Das Problem?"\n\n[15-35s] LÖSUNG (3 Punkte):\nVISUELL: Cut zwischen verschiedenen Szenen\n\n1. [15-22s] "${data.method}"\nTEXT OVERLAY: "1. [Kernpunkt]"\n\n2. [22-29s] "Zweiter Punkt aus ${data.method}"\nTEXT OVERLAY: "2. [Kernpunkt]"\n\n3. [29-35s] "Dritter Punkt"\nTEXT OVERLAY: "3. [Kernpunkt]"\n\n[35-45s] ERGEBNIS + CTA:\nVISUELL: Zeige ${data.result}\nVOICEOVER: "${data.result}"\nTEXT OVERLAY: "Follow für mehr"\nCTA: "Speichern für später"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\n[0-3s] HOOK:\n- Visuell: ${data.visualHook}\n- Text Overlay: ${data.result} ODER provokante Zahl\n- Voiceover: Max 10 Wörter\n- MUSS scrollen stoppen\n\n[3-15s] SETUP/PROBLEM:\n- Visuell: Zeige ${data.startSituation}\n- Voiceover: Problem klar benennen\n- Text Overlay: "Das Problem?" oder ähnlich\n- Relate-able machen\n\n[15-${parseInt(data.duration)-10}s] LÖSUNG:\n- 3 konkrete Punkte aus ${data.method}\n- Pro Punkt: 5-8 Sekunden\n- Text Overlays: Nummerierung (1., 2., 3.)\n- Voiceover: Kurz, knackig\n- Visuelle Variation (Cuts alle 3-5s)\n\n[${parseInt(data.duration)-10}s-${data.duration}] CTA:\n- Visuell: ${data.result} zeigen\n- Voiceover: Ergebnis + CTA\n- Text Overlay: "Follow", "Save", "DM me"\n\n🚨 REEL-REGELN:\n- Jede Sekunde zählt - kein Füllmaterial\n- Text Overlays: Max 5 Wörter\n- Voiceover: Kurze Sätze (max 10 Wörter)\n- Visuelle Anweisungen in [Klammern]\n- B-Roll-Vorschläge wo sinnvoll\n- Musik-Suggestion am Ende\n- Hook in ersten 3s entscheidet über Retention\n`,
-                
-                'twitter-thread': `Aufgabe:\nErstelle einen Twitter/X Thread über "${data.topic}".\n\n🎯 DEINE DETAILS:\n- Beispiel/Fall: ${data.example}\n- Ausgangssituation: ${data.startSituation}\n- Ergebnis: ${data.result}\n- Methode: ${data.method}\n- Erkenntnis: ${data.insight}\n\n✅ THREAD-BEISPIEL (10 Tweets):\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTweet 1:\n"Von 200 auf 10k Follower in 4 Monaten.\nKein Geld. Kein Team. Eine These.\n\nHier ist was funktioniert: 🧵"\n\nTweet 2:\n"1/ Consistency > Virality\n\n1 Thread/Tag. Jeden Tag. 120 Tage.\n73% hatten <100 Views. Egal. Ich machte weiter."\n\nTweet 3:\n"2/ Build in Public\n\nNicht: 'Mein Produkt ist fertig!'\nSondern: 'Tag 1: Ich baue X. Hier ist warum.'\n\n300 → 1.2k Follower in 3 Monaten."\n\nTweet 4-9: [Weitere Punkte mit Zahlen]\n\nTweet 10:\n"Zusammenfassung:\n- Consistency > Virality\n- Build in Public\n- [Weitere Punkte]\n\nWas davon testest du diese Woche?"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT (8-12 Tweets):\n\nTweet 1 (Hook):\n- ${data.result} ODER ${data.insight}\n- Muss scrollen stoppen\n- Max 280 Zeichen\n- Endet mit "🧵" oder "Thread:"\n- NICHT: "Ich möchte eine Story teilen"\n\nTweet 2-10 (Content):\n- Nummerierung: "1/", "2/", etc.\n- Pro Tweet: 1 Hauptpunkt\n- Story-Arc: ${data.startSituation} → ${data.method} → ${data.result}\n- Konkrete Zahlen wo möglich\n- Jeder Tweet standalone lesbar\n- Max 280 Zeichen pro Tweet\n\nTweet 11-12 (Outro):\n- Zusammenfassung (1-2 Sätze)\n- ${data.insight} als Kernaussage\n- CTA: "Follow für mehr" / "Like wenn hilfreich" / "Retweet wenn du zustimmst"\n- Optional: Link zu Deep-Dive\n\n🚨 TWITTER-REGELN:\n- Jeder Tweet MAX 280 Zeichen (zähle nach!)\n- Keine Hashtags (außer max 2 am Ende des letzten Tweets)\n- ${data.insight} muss klar rauskommen\n- Kurze Sätze (max 15 Wörter)\n- Aktive Sprache\n- Konkrete Zahlen > vage Aussagen\n`,
-                
-                'meta-ad': `Aufgabe:\nErstelle Meta Ad Copy für "${data.product}".\n\n🎯 DEINE DETAILS:\n- Produkt: ${data.product}\n- Zielgruppe: ${data.targetAudience}\n- Hauptproblem: ${data.mainProblem}\n- Angebot: ${data.offer}\n- Größter Einwand: ${data.biggestObjection}\n\n✅ AD-BEISPIEL:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPRIMARY TEXT:\n"Content-Chaos?\n\n8h/Woche für Posts. Trotzdem kein Plan.\n\nDas System-Kit löst das:\n✓ 20 Caption-Vorlagen\n✓ Prompt-Pack für AI\n✓ Mini-Funnel Blueprint\n\nJetzt für 49€. Kein Abo. Lifetime Updates.\n\nGetestet mit 200+ Solopreneuren. Spart durchschnittlich 8h/Woche."\n\nHEADLINE:\n"Content planen in 60 Min statt 8h"\n\nDESCRIPTION:\n"System-Kit für Solopreneure: Templates + Prompts + Funnels. 49€ einmalig."\n\nCTA BUTTON:\n"Jetzt holen"\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\nPRIMARY TEXT (125 Zeichen max):\n1. Hook mit ${data.mainProblem}\n   - Stelle Problem dar (1-2 Sätze)\n   - Relatable für ${data.targetAudience}\n\n2. Solution mit ${data.product}\n   - 3 Haupt-Benefits (Checkmarks ✓)\n   - Konkrete Outcomes\n\n3. Offer: ${data.offer}\n   - Preis/Angebot klar\n   - Was enthalten ist\n\n4. Social Proof (optional)\n   - Zahlen, Testimonials\n\n5. Einwand-Handling:\n   - ${data.biggestObjection} direkt adressieren\n   - 1 Satz Antwort\n\nHEADLINE (40 Zeichen max):\n- Benefit-orientiert\n- NICHT: "${data.product}"\n- SONDERN: Outcome für ${data.targetAudience}\n- Beispiel: "Content in 60 Min planen"\n\nDESCRIPTION (30 Zeichen max):\n- Produkt + Hauptnutzen\n- Preis/Angebot erwähnen\n- Klar und präzise\n\nCTA BUTTON:\n- Action-orientiert\n- "Jetzt holen" / "Mehr erfahren" / "Starten"\n- NICHT: "Klick hier"\n\n🚨 META AD REGELN:\n- Primary Text: Story, nicht Verkäufer-Pitch\n- ${data.mainProblem} in ersten 2 Zeilen\n- ${data.biggestObjection} entkräften\n- Konkrete Zahlen wo möglich\n- Emojis sparsam (max 3)\n- Für ${data.targetAudience} schreiben, nicht für alle\n`,
-                
-                'landing-page': `Aufgabe:\nErstelle Landing Page Copy für "${data.lpProduct}".\n\n🎯 DEINE DETAILS:\n- Produkt: ${data.lpProduct}\n- Hauptnutzen: ${data.mainBenefit}\n- Preis: ${data.price}\n- Top 3 Einwände: ${data.topObjections}\n- Zielgruppe: ${data.targetAudience}\n\n✅ LANDING PAGE STRUKTUR:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n**HERO SECTION:**\n\nHeadline:\n"${data.mainBenefit}"\n\nSubheadline:\n"Für ${data.targetAudience} die [spezifisches Problem] lösen wollen. Ohne [Common Struggle]."\n\nCTA Button:\n"${data.price} - Jetzt starten"\n\n**PROBLEM SECTION:**\n\nKennst du das?\n• [Problem 1 aus ${data.topObjections}]\n• [Problem 2]\n• [Problem 3]\n\nDas muss nicht sein.\n\n**SOLUTION SECTION:**\n\n${data.lpProduct} gibt dir:\n✓ [Benefit 1]\n✓ [Benefit 2]\n✓ [Benefit 3]\n\nErgebnis: ${data.mainBenefit}\n\n**HOW IT WORKS:**\n\n1. [Step 1]\n2. [Step 2]\n3. [Step 3]\n\n**EINWAND-HANDLING:**\n\n"${data.topObjections.split(',')[0]}?"\n→ [Antwort 1 Satz]\n\n"${data.topObjections.split(',')[1]}?"\n→ [Antwort 1 Satz]\n\n"${data.topObjections.split(',')[2]}?"\n→ [Antwort 1 Satz]\n\n**PRICING:**\n\n${data.price}\n\n[Was ist enthalten]\n✓ Feature 1\n✓ Feature 2\n✓ Feature 3\n\nCTA: "Jetzt ${data.price} sichern"\n\n**GUARANTEE (optional):**\n\n[Risk Reversal wenn applicable]\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\n1. HERO:\n   - Headline: ${data.mainBenefit} (max 10 Wörter)\n   - Subheadline: Für wen + was sie bekommen (max 20 Wörter)\n   - CTA: Preis + Action\n\n2. PROBLEM (3-5 Bullets):\n   - Nutze ${data.topObjections}\n   - Pain Points klar benennen\n   - Relatable für ${data.targetAudience}\n\n3. SOLUTION:\n   - 3-5 Haupt-Benefits\n   - Was ist in ${data.lpProduct}\n   - Outcome-fokussiert\n\n4. HOW IT WORKS (3 Steps):\n   - Simple Prozess\n   - Kein Fachchinesisch\n   - Quick Wins zeigen\n\n5. EINWAND-HANDLING:\n   - Jeder Einwand aus ${data.topObjections}\n   - Direkte, ehrliche Antwort\n   - 1-2 Sätze pro Einwand\n\n6. PRICING SECTION:\n   - ${data.price} prominent\n   - Was ist enthalten (Features + Benefits)\n   - CTA wiederholen\n\n7. GUARANTEE (optional):\n   - Falls anwendbar: Risk Reversal\n   - Money-back, Trial, etc.\n\n🚨 LANDING PAGE REGELN:\n- Für ${data.targetAudience} schreiben\n- ${data.mainBenefit} min. 3x erwähnen\n- Alle ${data.topObjections} adressieren\n- Konkrete Outcomes > Features\n- CTAs: Min. 3x auf der Page\n- Kurze Absätze (max 3 Zeilen)\n- Scannable (Bullets, Überschriften)\n`,
-                
-                'case-study': `Aufgabe:\nErstelle eine Case Study für "${data.projectName}".\n\n🎯 DEINE DETAILS:\n- Projekt/Kunde: ${data.projectName}\n- Vorher: ${data.before}\n- Nachher: ${data.after}\n- Methode: ${data.method}\n- Zeitraum: ${data.timeframe}\n\n✅ CASE STUDY BEISPIEL:\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n**CASE STUDY: STARTUP TASKFLOW**\n\n*Von 0 Leads auf 340/Monat in 4 Monaten*\n\n**Challenge:**\n\nTaskFlow kam zu mir mit:\n• 0 organische Leads\n• Bounce Rate 78%\n• Budget: $500/Monat\n• Deadline: 6 Monate bis Series A\n\nDas Problem: Generisches Marketing. Keine klare Positionierung.\n\n**Approach:**\n\nStatt breiter Kampagne:\n\n1. **Nischen-Fokus**\n   - Von "Projektmanagement für alle"\n   - Zu "Projektmanagement für Remote-Teams"\n\n2. **SEO-Cluster**\n   - 20 Artikel zu "Remote Team Management"\n   - Interlinks, kein Random Content\n\n3. **Reddit-Research**\n   - 500 Fragen analysiert\n   - Content auf echte User-Fragen\n\n**Results:**\n\nNach 4 Monaten:\n✓ 340 Leads/Monat (von 0)\n✓ Bounce Rate 23% (von 78%)\n✓ Position 1-3 für 15 Keywords\n✓ $12k MRR\n\nCoat: $2.4k total (SEO + Content)\nROI: 5x in Monat 4\n\n**Key Takeaway:**\n\n"Die meisten wollen alle erreichen.\nWir haben eine Nische dominiert.\nDas war der Unterschied."\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🔨 ERSTELLE JETZT:\n\n**TITEL:**\n"Case Study: ${data.projectName}"\n*[1-Zeile Transformation: ${data.before} → ${data.after}]*\n\n**CHALLENGE (3-5 Bullets):**\n- ${data.before} detailliert\n- Spezifische Zahlen\n- Was war das Hauptproblem?\n- Warum war es schwierig?\n\n**APPROACH (3-4 Punkte):**\n- ${data.method} in Steps aufteilen\n- Pro Step: Was + Warum\n- Konkrete Taktiken, keine Buzzwords\n- Was hast du ANDERS gemacht?\n\n**RESULTS:**\n- ${data.after} mit konkreten Zahlen\n- Vorher/Nachher Vergleich\n- Zeitraum: ${data.timeframe}\n- Optional: ROI, Kosten, weitere Metriken\n\n**KEY TAKEAWAY (1-2 Sätze):**\n- Kernlearning aus dem Projekt\n- Quote-würdig\n- Keine Plattitüden\n\n🚨 CASE STUDY REGELN:\n- Alle Zahlen aus ${data.before} und ${data.after} müssen vorkommen\n- ${data.method} konkret erklären (kein "Wir haben Marketing gemacht")\n- Zeitraum ${data.timeframe} klar benennen\n- Story-Format: Problem → Lösung → Ergebnis\n- Keine generischen Aussagen\n- Spezifisch genug dass es glaubwürdig ist\n`,
-            };
-            
-            return prompts[id] || `Aufgabe:\nErstelle Content für "${id}".\n\nNutze Brand-Infos oben.\n`;
-        }
-
-        function saveBrand() {
-            brandData = {
-                name: document.getElementById('brandName').value,
-                offering: document.getElementById('offering').value,
-                audience: document.getElementById('audience').value,
-                pillars: document.getElementById('pillars').value,
-                usps: document.getElementById('usps').value,
-                voice: document.getElementById('voice').value,
-                noGos: document.getElementById('noGos').value
-            };
-            
-            localStorage.setItem('smarthirn_brand', JSON.stringify(brandData));
-            showStatus('brandStatus', 'success', '✅ Brand Identity gespeichert!');
-        }
-
-        function loadBrand() {
-            const saved = localStorage.getItem('smarthirn_brand');
-            if (saved) {
-                brandData = JSON.parse(saved);
-                document.getElementById('brandName').value = brandData.name || '';
-                document.getElementById('offering').value = brandData.offering || '';
-                document.getElementById('audience').value = brandData.audience || '';
-                document.getElementById('pillars').value = brandData.pillars || '';
-                document.getElementById('usps').value = brandData.usps || '';
-                document.getElementById('voice').value = brandData.voice || 'direkt';
-                document.getElementById('noGos').value = brandData.noGos || '';
-            }
-        }
-
-        function exportBrand() {
-            const data = JSON.stringify(brandData, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'smarthirn-brand.json';
-            a.click();
-        }
-
-        function showStatus(elementId, type, message) {
-            const el = document.getElementById(elementId);
-            el.className = `status ${type}`;
-            el.textContent = message;
-            el.classList.remove('hidden');
-            setTimeout(() => el.classList.add('hidden'), 3000);
-        }
-
         function copyPrompt() {
-            const text = document.getElementById('resultBox').textContent;
-            navigator.clipboard.writeText(text);
-            event.target.textContent = '✅ Kopiert!';
-            setTimeout(() => event.target.textContent = '📋 Prompt kopieren', 2000);
+            const text = document.getElementById('resultBox').innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "✅ Kopiert!";
+            setTimeout(() => btn.innerHTML = originalText, 2000);
         }
     </script>
 </body>
